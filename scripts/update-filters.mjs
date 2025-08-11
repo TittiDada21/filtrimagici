@@ -51,7 +51,11 @@ const CANDIDATES = [
       { op: 'contrast', value: 0.10 }, { op: 'splitTone', shadows: {h:200,s:0.22}, highlights:{h:35,s:0.18} }, { op: 'clarity', value: 0.08 }
   ]},
   { id: 'noir-edges', name: 'Noir Edges', likes: 48, pipeline: [
-      { op: 'grayscale' }, { op: 'edge', amount: 0.9 }, { op: 'levels', low: 0.12, high: 0.88 }
+      { op: 'grayscale' },
+      { op: 'contrast', value: 0.25 },
+      { op: 'clarity', value: 0.2 },
+      { op: 'vignette', value: 0.2 },
+      { op: 'grain', value: 0.1 }
   ]},
   { id: 'warm-film-grain', name: 'Warm Film Grain', likes: 77, pipeline: [
       { op: 'exposure', value: -0.03 }, { op: 'warmth', value: 0.20 }, { op: 'grain', value: 0.18 }

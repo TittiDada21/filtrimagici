@@ -91,21 +91,31 @@ async function main(){
     ...(await adapters.pilgram()),
     ...(await adapters.opencv())
   ];
+  const threeMonthsAgo = new Date(now); threeMonthsAgo.setMonth(now.getMonth()-3);
   const pool = [...CANDIDATES, ...fromAdapters]
-    .map(x => ({...x, created_at: now.toISOString().slice(0,10)}));
+    .map(x => ({...x, created_at: now.toISOString().slice(0,10)}))
+    // filtro temporalità: ultimi ~3 mesi
+    .filter(x => new Date(x.created_at) >= threeMonthsAgo);
 
-  // 2) ranking: likes + diversity penalty per family
-  const familyCount = {};
-  const scored = pool
-    .sort((a,b)=> (b.likes||0)-(a.likes||0))
-    .map(f => {
-      const fam = f.family || 'misc';
-      const penalty = (familyCount[fam]||0) * 5; // penalizza ripetizioni
-      const score = (f.likes||0) - penalty;
-      familyCount[fam] = (familyCount[fam]||0) + 1;
-      return { ...f, score };
-    })
-    .sort((a,b)=> b.score - a.score);
+  // 2) ranking: likes + dissimilarità tra selezionati (diversità forte)
+  function cosineSim(a,b){
+    const fams = ['contrast','teal','film','mono','pattern','misc'];
+    const va = fams.map(f => (a.family===f?1:0));
+    const vb = fams.map(f => (b.family===f?1:0));
+    const dot = va.reduce((s,v,i)=> s+v*vb[i],0);
+    const na = Math.sqrt(va.reduce((s,v)=> s+v*v,0));
+    const nb = Math.sqrt(vb.reduce((s,v)=> s+v*v,0));
+    return dot/(na*nb||1);
+  }
+  const baseRank = [...pool].sort((a,b)=> (b.likes||0)-(a.likes||0));
+  const picked = [];
+  for(const cand of baseRank){
+    if(picked.length>=10) break;
+    const similar = picked.some(p => cosineSim(p,cand) > 0.8);
+    if(similar) continue; // scarta se troppo simile a uno già preso
+    picked.push(cand);
+  }
+  const scored = picked;
 
   // 3) rotazione deterministica settimanale
   const offset = parseInt(stamp.slice(-2),10) % scored.length;

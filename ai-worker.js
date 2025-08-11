@@ -46,18 +46,38 @@ function postprocessCHWtoRGBA(chw, width, height){
   return out;
 }
 
+function resizeNearest(rgba, sw, sh, dw, dh){
+  if (sw===dw && sh===dh) return rgba;
+  const out = new Uint8ClampedArray(dw*dh*4);
+  for(let y=0;y<dh;y++){
+    const sy = Math.min(sh-1, Math.round(y*sh/dh));
+    for(let x=0;x<dw;x++){
+      const sx = Math.min(sw-1, Math.round(x*sw/dw));
+      const sp = (sy*sw+sx)*4;
+      const dp = (y*dw+x)*4;
+      out[dp]=rgba[sp]; out[dp+1]=rgba[sp+1]; out[dp+2]=rgba[sp+2]; out[dp+3]=255;
+    }
+  }
+  return out;
+}
+
 self.onmessage = async (e)=>{
   const { id, width, height, data, model } = e.data;
   try {
     const session = await getSession(model);
-    const input = preprocessRGBAtoCHWFloat32(new Uint8ClampedArray(data), width, height);
+    // Portiamo la dimensione a multipli di 32 (molti modelli lo richiedono)
+    const dw = Math.max(32, Math.floor(width/32)*32);
+    const dh = Math.max(32, Math.floor(height/32)*32);
+    const resized = resizeNearest(new Uint8ClampedArray(data), width, height, dw, dh);
+    const input = preprocessRGBAtoCHWFloat32(resized, dw, dh);
     const inputName = (session.inputNames && session.inputNames[0]) || 'input';
-    const feeds = {}; feeds[inputName] = new ort.Tensor('float32', input, [1,3,height,width]);
+    const feeds = {}; feeds[inputName] = new ort.Tensor('float32', input, [1,3,dh,dw]);
     const results = await session.run(feeds);
     const outputName = (session.outputNames && session.outputNames[0]) || Object.keys(results)[0];
     const outTensor = results[outputName];
-    const chw = outTensor.data; // Float32Array 1x3xHxW
-    const rgba = postprocessCHWtoRGBA(chw, width, height);
+    const chw = outTensor.data; // Float32Array 1x3xDh x Dw
+    const rgbaSmall = postprocessCHWtoRGBA(chw, dw, dh);
+    const rgba = resizeNearest(rgbaSmall, dw, dh, width, height);
     self.postMessage({ id, width, height, data: rgba.buffer }, [rgba.buffer]);
   } catch (err){
     // In caso di errore, rimanda input per non bloccare UX

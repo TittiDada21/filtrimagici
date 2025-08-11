@@ -72,7 +72,9 @@
         </div>
       </div>
       <input type="file" id="file" accept="image/*" />
-      <div class="muted small" style="margin-top:8px">Selezione automatica: ultimi 3 mesi · massima diversità · likes ≥ 10</div>
+      <div class="muted small" style="margin-top:8px">
+        Selezione automatica: ultimi 3 mesi · massima diversità · likes ≥ 10
+      </div>
     </div>
 
     <div class="viewer-row">
@@ -392,29 +394,15 @@
       fitCanvasToImage(SOURCE_IMG);
       $ctx.drawImage(SOURCE_IMG, 0, 0, $canvas.width, $canvas.height);
 
-      let imgData = $ctx.getImageData(0,0,$canvas.width,$canvas.height);
-
-      // Se è un filtro AI, delega al worker AI (stub temporaneo)
-      if (f.type === 'ai' && f.model) {
-        if (!aiWorker) aiWorker = new Worker('ai-worker.js');
-        aiWorker.onmessage = (e)=>{
-          console.log('AI Worker risposta ricevuta:', e.data);
-          const { data } = e.data;
-          const out = new ImageData(new Uint8ClampedArray(data), $canvas.width, $canvas.height);
-          $ctx.putImageData(out,0,0);
-          $meta.textContent = `Filtro AI: ${f.name}  ·  modello: ${f.model.framework.toUpperCase()}`;
-          CURRENT_FILTER_ID = f.id; updateActiveThumb();
-        };
-        aiWorker.onerror = (err)=>{
-          console.error('AI Worker errore:', err);
-          $meta.textContent = `Errore modello AI: ${f.name}`;
-        };
-        // Mostra stato caricamento
-        $meta.textContent = `Carico modello AI… ${f.name}`;
-        console.log('Invio messaggio al worker AI:', { id:f.id, width:$canvas.width, height:$canvas.height, model: f.model });
-        aiWorker.postMessage({ id:f.id, width:$canvas.width, height:$canvas.height, data: imgData.data.buffer, model: f.model }, [imgData.data.buffer]);
+      // Applica filtro
+      if (f.type === 'ai') {
+        // Rimuovo logica AI, uso solo filtri normali
+        $meta.textContent = `Filtro: ${f.name}`;
+        CURRENT_FILTER_ID = f.id; updateActiveThumb();
         return;
       }
+      
+      const imgData = $ctx.getImageData(0, 0, $canvas.width, $canvas.height);
       const px = imgData.data;
 
       const clamp01 = v => Math.max(0, Math.min(1, v));

@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Filters – Demo (locale)</title>
+  <style>
+    :root { --bg:#0b0d10; --fg:#e8eef4; --muted:#9fb1c6; --acc:#7bdff2; }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b0d10,#141821);color:var(--fg);font:16px/1.4 system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:960px;margin:0 auto;padding:24px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    h1{font-size:20px;margin:0}
+    .card{background:#0f131b;border:1px solid #1f2633;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .row{display:flex;gap:16px;flex-wrap:wrap}
+    .col{flex:1 1 360px}
+    .drop{border:1px solid #253146;border-radius:12px;padding:20px;text-align:center;color:var(--muted);background:#0e1521}
+    .drop:hover{border-color:#2f3d54;background:#111a28}
+    .drop.drag{background:#121a27;border-color:var(--acc);box-shadow:0 0 0 2px rgba(123,223,242,.15) inset}
+    input[type=file]{display:none}
+    button{cursor:pointer;background:#182236;color:#dbe6f3;border:1px solid #253146;border-radius:10px;padding:10px 14px;font-weight:600}
+    button.primary{background:var(--acc);color:#052532;border:none}
+    /* nuova barra filtri a pillole */
+    .thumbs{display:flex;gap:8px;margin-top:8px;overflow-x:auto;padding:6px 2px}
+    .thumb{border-radius:999px;border:1px solid #253146;padding:8px 12px;display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#cfe0f7;background:#141b28;white-space:nowrap}
+    .thumb:hover{background:#182236}
+    .thumb span{display:inline}
+    canvas, img#preview{width:100%;height:auto;border-radius:12px;border:1px solid #253146;background:#0b0f16}
+    .muted{color:var(--muted)}
+    footer{margin-top:16px;color:#8fa4be;font-size:12px}
+    .small{font-size:12px}
+    /* pannello testo/"design" a scomparsa */
+    .prose{margin-top:24px}
+    .prose h2{font-size:18px;margin:18px 0 8px}
+    .prose h3{font-size:16px;margin:16px 0 6px}
+    .prose p{color:#d5e2f3}
+    .prose ul{margin:8px 0 8px 18px}
+    .prose li{margin:6px 0}
+    pre{background:#0b0f16;border:1px solid #253146;border-radius:12px;padding:12px;overflow:auto}
+    code{color:#bfe2ff}
+    details.panel{margin-top:16px}
+    details.panel>summary{cursor:pointer;list-style:none;background:#0f131b;border:1px solid #1f2633;border-radius:12px;padding:12px 14px;font-weight:600;color:#cfe0f7}
+    details.panel[open]>summary{border-bottom-left-radius:0;border-bottom-right-radius:0}
+    details.panel .panel-body{border:1px solid #1f2633;border-top:none;border-bottom-left-radius:12px;border-bottom-right-radius:12px;padding:12px 14px;background:#0f131b}
+  </style>
+  <meta name="description" content="Prova in locale 5 filtri AI selezionati automaticamente. Zero upload, tutto nel browser." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🧪</text></svg>">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>AI Filters — 10 selezionati automaticamente (locale)</h1>
+      <div class="toolbar" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="btnReset" title="Reimposta immagine" disabled>Reimposta</button>
+        <button id="btnRandom" disabled>Applica filtro a caso</button>
+        <button id="btnDownload" class="primary" disabled>Scarica risultato</button>
+      </div>
+    </header>
+
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="drop" id="drop">
+            <strong>Carica un'immagine</strong><br/>
+            <span class="muted small">PNG/JPG, niente upload: tutto nel browser</span>
+            <div style="margin-top:12px">
+              <button id="btnUpload" class="primary">Scegli file…</button>
+            </div>
+          </div>
+          <input type="file" id="file" accept="image/*" />
+          <div class="thumbs" id="thumbs"></div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card">
+          <canvas id="canvas"></canvas>
+          <img id="preview" alt="" style="display:none" />
+          <div class="muted small" style="margin-top:8px" id="meta"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pannelli testo a scomparsa -->
+    <details class="panel">
+      <summary>Perché potrebbe avere senso</summary>
+      <div class="panel-body prose">
+        <p><strong>Secondo me, ha senso</strong> — dipende dalla nicchia e da come lo presenti.</p>
+        <ul>
+          <li><strong>Librerie/repo di filtri</strong> spesso non offrono un vero pannello di test immediato.</li>
+          <li>Su <strong>GitHub</strong> c'è codice ma non interfaccia; su <strong>Hugging Face</strong> provi un modello alla volta; su <strong>NPM</strong> non c'è anteprima interattiva.</li>
+          <li>Un <strong>aggregatore interattivo</strong> con i 5 filtri “nuovi + con feedback” e prova istantanea, <em>tutto in locale</em>, è utile, divertente e promozionale.</li>
+        </ul>
+        <h3>Cosa valutare</h3>
+        <ul>
+          <li><strong>Origine</strong> dei filtri: HF (style‑transfer), repo curato, backend.</li>
+          <li><strong>Licenze</strong> per test pubblici.</li>
+          <li><strong>UX/velocità</strong> e <strong>branding</strong>.</li>
+        </ul>
+        <h3>Plus</h3>
+        <ul>
+          <li>Test multiplo immediato</li>
+          <li>Classifica/feedback</li>
+          <li>Zero login / zero upload</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="panel">
+      <summary>Schema e automazione di filters.json</summary>
+      <div class="panel-body prose">
+        <p>Questa demo legge <strong>10 filtri</strong> da <code>filters.json</code> alla root del progetto. Se il file non è presente, usa un fallback locale. Tutto gira in locale nel browser (zero upload).</p>
+        <h3>Schema</h3>
+        <pre><code>{
+  "filters": [
+    {
+      "id": "unique-id",
+      "name": "Display name",
+      "likes": 42,
+      "created_at": "2025-08-11",
+      "pipeline": [
+        { "op": "contrast", "value": 0.12 },
+        { "op": "vibrance", "value": 0.30 },
+        { "op": "vignette", "value": 0.20 }
+      ],
+      "sources": [
+        { "name": "Filterous2", "url": "https://github.com/icarusion/Filterous2" },
+        { "name": "pilgram", "url": "https://github.com/akiomik/pilgram" },
+        { "name": "OpenCV tutorials", "url": "https://www.geeksforgeeks.org/opencv-python-tutorial/" }
+      ]
+    }
+  ]
+}</code></pre>
+        <p class="muted small">Operazioni supportate: <code>exposure</code>, <code>contrast</code>, <code>vibrance</code>, <code>saturation</code>, <code>hue</code>, <code>warmth</code>, <code>levels</code>, <code>grayscale</code>, <code>edge</code>, <code>splitTone</code>, <code>clarity</code>, <code>vignette</code>, <code>grain</code>, <code>halftone</code>.</p>
+        <h3>Aggiornamento settimanale (README veloce)</h3>
+        <ol>
+          <li>Prerequisiti: Node 18+.</li>
+          <li>Installa le dipendenze: <code>npm i</code>.</li>
+          <li>Genera/aggiorna i 10 filtri: <code>npm run update:filters</code>.
+            <br/><span class="muted small">Lo script crea preset ispirati a <em>Filterous2</em>, <em>pilgram</em> e pattern <em>OpenCV</em>, selezionati per likes e <em>ruotati</em> in modo deterministico in base al numero di settimana.</span>
+          </li>
+          <li>Servi in locale: <code>npm run serve</code> (o <code>python3 -m http.server 5173</code>).</li>
+        </ol>
+        <h3>Automazione</h3>
+        <ul>
+          <li><strong>GitHub Actions</strong>: esegui <code>npm run update:filters</code> 1×/settimana e committa il file generato.</li>
+          <li><strong>Vercel Cron</strong>: job che lancia uno script serverless che salva il JSON su Blob/KV e la app lo legge da lì.</li>
+        </ul>
+        <h3>Note</h3>
+        <ul>
+          <li>La UI filtra comunque i preset con <code>likes ≥ 10</code> e prende i più recenti (max 10).</li>
+          <li>Per aggiungere nuovi stili, modifica <code>scripts/update-filters.mjs</code> (array <code>CANDIDATES</code> o logica di ranking).</li>
+          <li>Privacy: nessuna immagine lascia il browser.</li>
+        </ul>
+      </div>
+    </details>
+
+    <footer>
+      <p>⚙️ Tutto avviene in locale. Se ricarichi la pagina, non rimane nulla.</p>
+    </footer>
+  </div>
+
+  <script>
+    // =========================
+    // 1) Fallback incorporato (se manca /filters.json)
+    // =========================
+    const FALLBACK_FILTERS = [
+      {
+        id: "neon-noise-v1",
+        name: "Neon Noise",
+        likes: 120,
+        created_at: "2025-07-15",
+        pipeline: [
+          { op: "exposure", value: 0.08 },
+          { op: "vibrance", value: 0.35 },
+          { op: "hue", value: 12 },
+          { op: "contrast", value: 0.12 },
+          { op: "grain", value: 0.15 }
+        ]
+      },
+      {
+        id: "film-wash-warm-v2",
+        name: "Film Wash Warm",
+        likes: 98,
+        created_at: "2025-07-22",
+        pipeline: [
+          { op: "exposure", value: -0.05 },
+          { op: "contrast", value: 0.08 },
+          { op: "warmth", value: 0.18 },
+          { op: "vignette", value: 0.25 }
+        ]
+      },
+      {
+        id: "ink-sketch-lite",
+        name: "Ink Sketch",
+        likes: 76,
+        created_at: "2025-07-30",
+        pipeline: [
+          { op: "grayscale" },
+          { op: "edge", amount: 1.0 },
+          { op: "levels", low: 0.15, high: 0.9 }
+        ]
+      },
+      {
+        id: "tealorange-cinematic",
+        name: "Teal & Orange",
+        likes: 210,
+        created_at: "2025-08-01",
+        pipeline: [
+          { op: "contrast", value: 0.1 },
+          { op: "splitTone", shadows: {h: 195, s: 0.22}, highlights: {h: 30, s: 0.18} },
+          { op: "clarity", value: 0.1 }
+        ]
+      },
+      {
+        id: "halftone-pop",
+        name: "Halftone Pop",
+        likes: 64,
+        created_at: "2025-08-05",
+        pipeline: [
+          { op: "saturation", value: 0.25 },
+          { op: "halftone", size: 6 },
+          { op: "contrast", value: 0.15 }
+        ]
+      }
+    ];
+
+    // =========================
+    // 2) UI elementi
+    // =========================
+    const $file = document.getElementById('file');
+    const $drop = document.getElementById('drop');
+    const $btnUpload = document.getElementById('btnUpload');
+    const $canvas = document.getElementById('canvas');
+    const $ctx = $canvas.getContext('2d', { willReadFrequently: true });
+    const $btnRandom = document.getElementById('btnRandom');
+    const $btnReset = document.getElementById('btnReset');
+    const $btnDownload = document.getElementById('btnDownload');
+    const $thumbs = document.getElementById('thumbs');
+    const $meta = document.getElementById('meta');
+    let SOURCE_IMG = null;
+    let FILTERS = [];
+
+    // =========================
+    // 3) Caricamento filtri da /filters.json o fallback
+    // =========================
+    async function loadFilters() {
+      try {
+        const res = await fetch('filters.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('not found');
+        const data = await res.json();
+        const MIN_LIKES = 10;
+        const sorted = (data.filters || [])
+          .filter(f => (f.likes || 0) >= MIN_LIKES)
+          .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
+          .slice(0, 10);
+        FILTERS = sorted.length === 10 ? sorted : FALLBACK_FILTERS;
+      } catch(e) {
+        FILTERS = FALLBACK_FILTERS;
+      }
+      renderThumbs();
+    }
+
+    // =========================
+    // 4) Rendering miniature/nomi dei 5 filtri
+    // =========================
+    function renderThumbs() {
+      $thumbs.innerHTML = '';
+      FILTERS.forEach(f => {
+        const d = document.createElement('div');
+        d.className = 'thumb';
+        d.innerHTML = `<div>🧪</div><span>${f.name}</span>`;
+        d.title = `likes: ${f.likes ?? 0}  ·  created: ${f.created_at}`;
+        d.onclick = () => applyFilter(f);
+        $thumbs.appendChild(d);
+      });
+    }
+
+    // =========================
+    // 5) Caricamento immagine
+    // =========================
+    // Apertura affidabile del file picker: click esplicito sul bottone
+    $btnUpload.addEventListener('click', (e)=>{
+      e.preventDefault();
+      // reset del valore per assicurare che la stessa selezione venga rilevata
+      $file.value = '';
+      $file.click();
+    });
+    $drop.addEventListener('dragover', e => { e.preventDefault(); $drop.classList.add('drag'); });
+    $drop.addEventListener('dragleave', () => $drop.classList.remove('drag'));
+    $drop.addEventListener('drop', e => {
+      e.preventDefault(); $drop.classList.remove('drag');
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+    $file.addEventListener('change', e => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        handleFile(file);
+      }
+    });
+
+    function handleFile(file){
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        SOURCE_IMG = img;
+        fitCanvasToImage(img);
+        $ctx.drawImage(img, 0, 0, $canvas.width, $canvas.height);
+        $btnRandom.disabled = false;
+        $btnReset.disabled = false;
+        $btnDownload.disabled = false;
+        $meta.textContent = '';
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }
+
+    function fitCanvasToImage(img){
+      const maxW = 900, maxH = 900;
+      let { width:w, height:h } = img;
+      const r = Math.min(maxW / w, maxH / h, 1);
+      $canvas.width = Math.round(w * r);
+      $canvas.height = Math.round(h * r);
+    }
+
+    // =========================
+    // 6) Applicazione filtro (pipeline su pixel)
+    // =========================
+    function applyFilter(f){
+      if (!SOURCE_IMG) return;
+      fitCanvasToImage(SOURCE_IMG);
+      $ctx.drawImage(SOURCE_IMG, 0, 0, $canvas.width, $canvas.height);
+
+      let imgData = $ctx.getImageData(0,0,$canvas.width,$canvas.height);
+      const px = imgData.data;
+
+      const clamp01 = v => Math.max(0, Math.min(1, v));
+      const rgb2hsv = (r,g,b)=>{
+        r/=255; g/=255; b/=255;
+        const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+        let h=0,s=max===0?0:d/max,v=max;
+        if(d!==0){
+          if(max===r) h=((g-b)/d)%6;
+          else if(max===g) h=(b-r)/d+2;
+          else h=(r-g)/d+4;
+          h*=60; if(h<0) h+=360;
+        }
+        return [h,s,v];
+      };
+      const hsv2rgb=(h,s,v)=>{
+        const c=v*s;
+        const x=c*(1-Math.abs((h/60)%2-1));
+        const m=v-c;
+        let [r,g,b]=[0,0,0];
+        if(h<60){[r,g,b]=[c,x,0]}
+        else if(h<120){[r,g,b]=[x,c,0]}
+        else if(h<180){[r,g,b]=[0,c,x]}
+        else if(h<240){[r,g,b]=[0,x,c]}
+        else if(h<300){[r,g,b]=[x,0,c]}
+        else {[r,g,b]=[c,0,x]}
+        return [(r+m)*255,(g+m)*255,(b+m)*255];
+      };
+
+      const ops = {
+        exposure:(v)=>{
+          const g = 1 - v;
+          for(let i=0;i<px.length;i+=4){
+            px[i] = 255*Math.pow(px[i]/255, g);
+            px[i+1]=255*Math.pow(px[i+1]/255, g);
+            px[i+2]=255*Math.pow(px[i+2]/255, g);
+          }
+        },
+        contrast:(v)=>{
+          const f = (1+v)/(1-v+1e-6);
+          for(let i=0;i<px.length;i+=4){
+            px[i]= clamp01((((px[i]/255)-0.5)*f+0.5))*255;
+            px[i+1]= clamp01((((px[i+1]/255)-0.5)*f+0.5))*255;
+            px[i+2]= clamp01((((px[i+2]/255)-0.5)*f+0.5))*255;
+          }
+        },
+        vibrance:(v)=>{
+          for(let i=0;i<px.length;i+=4){
+            const [h,s,va]=rgb2hsv(px[i],px[i+1],px[i+2]);
+            const s2 = clamp01(s + v*(1-s));
+            const [r,g,b]=hsv2rgb(h,s2,va);
+            px[i]=r; px[i+1]=g; px[i+2]=b;
+          }
+        },
+        saturation:(v)=>{
+          for(let i=0;i<px.length;i+=4){
+            const [h,s,va]=rgb2hsv(px[i],px[i+1],px[i+2]);
+            const s2 = clamp01(s + v);
+            const [r,g,b]=hsv2rgb(h,s2,va);
+            px[i]=r; px[i+1]=g; px[i+2]=b;
+          }
+        },
+        hue:(deg)=>{
+          for(let i=0;i<px.length;i+=4){
+            let [h,s,va]=rgb2hsv(px[i],px[i+1],px[i+2]);
+            h=(h+deg+360)%360;
+            const [r,g,b]=hsv2rgb(h,s,va);
+            px[i]=r; px[i+1]=g; px[i+2]=b;
+          }
+        },
+        warmth:(v)=>{
+          for(let i=0;i<px.length;i+=4){
+            px[i]+= -30*v*255/100;
+            px[i+2]+= 30*v*255/100;
+          }
+        },
+        levels:({low=0,high=1})=>{
+          for(let i=0;i<px.length;i+=4){
+            px[i]= clamp01((px[i]/255 - low)/(high-low))*255;
+            px[i+1]= clamp01((px[i+1]/255 - low)/(high-low))*255;
+            px[i+2]= clamp01((px[i+2]/255 - low)/(high-low))*255;
+          }
+        },
+        grayscale:()=>{
+          for(let i=0;i<px.length;i+=4){
+            const y = 0.2126*px[i]+0.7152*px[i+1]+0.0722*px[i+2];
+            px[i]=px[i+1]=px[i+2]=y;
+          }
+        },
+        edge:({amount=1})=>{
+          const w=$canvas.width,h=$canvas.height;
+          const src=new Uint8ClampedArray(px);
+          const off=(x,y)=> (y*w+x)*4;
+          const gx=[-1,0,1,-2,0,2,-1,0,1];
+          const gy=[-1,-2,-1,0,0,0,1,2,1];
+          for(let y=1;y<h-1;y++){
+            for(let x=1;x<w-1;x++){
+              let sx=0, sy=0; let k=0;
+              for(let j=-1;j<=1;j++){
+                for(let i=-1;i<=1;i++){
+                  const p=off(x+i,y+j);
+                  const yv=.2126*src[p]+.7152*src[p+1]+.0722*src[p+2];
+                  sx += gx[k]*yv; sy += gy[k]*yv; k++;
+                }
+              }
+              const mag = clamp01(Math.hypot(sx,sy)/255)*255*amount;
+              const p=off(x,y);
+              px[p]=px[p+1]=px[p+2]=mag;
+            }
+          }
+        },
+        splitTone:({shadows,highlights})=>{
+          for(let i=0;i<px.length;i+=4){
+            const l = (0.2126*px[i]+0.7152*px[i+1]+0.0722*px[i+2])/255;
+            const tone = l<0.5 ? shadows : highlights;
+            const [r,g,b]=hsv2rgb(tone.h, tone.s, 1);
+            px[i]= clamp01((px[i]/255*0.85 + (r/255)*0.15))*255;
+            px[i+1]= clamp01((px[i+1]/255*0.85 + (g/255)*0.15))*255;
+            px[i+2]= clamp01((px[i+2]/255*0.85 + (b/255)*0.15))*255;
+          }
+        },
+        clarity:(v)=>{
+          const w=$canvas.width,h=$canvas.height;
+          const src=new Uint8ClampedArray(px);
+          const off=(x,y)=>(y*w+x)*4;
+          const blur= (x,y)=>{
+            let r=0,g=0,b=0,c=0;
+            for(let j=-1;j<=1;j++) for(let i=-1;i<=1;i++){
+              const xx=Math.min(w-1,Math.max(0,x+i));
+              const yy=Math.min(h-1,Math.max(0,y+j));
+              const p=off(xx,yy); r+=src[p]; g+=src[p+1]; b+=src[p+2]; c++;
+            }
+            return [r/c,g/c,b/c];
+          };
+          for(let y=0;y<h;y++){
+            for(let x=0;x<w;x++){
+              const p=off(x,y);
+              const [br,bg,bb]=blur(x,y);
+              px[p]+= (src[p]-br)*v*2;
+              px[p+1]+= (src[p+1]-bg)*v*2;
+              px[p+2]+= (src[p+2]-bb)*v*2;
+            }
+          }
+        },
+        vignette:(v)=>{
+          const w=$canvas.width,h=$canvas.height;
+          const cx=w/2, cy=h/2, max=Math.hypot(cx,cy);
+          for(let y=0;y<h;y++){
+            for(let x=0;x<w;x++){
+              const dx=x-cx, dy=y-cy;
+              const t = (Math.hypot(dx,dy)/max);
+              const dark = Math.pow(t, 2.5)*v;
+              const p=(y*w+x)*4;
+              px[p]*=(1-dark); px[p+1]*=(1-dark); px[p+2]*=(1-dark);
+            }
+          }
+        },
+        grain:(v)=>{
+          for(let i=0;i<px.length;i+=4){
+            const n = (Math.random()*2-1)*v*50;
+            px[i]+=n; px[i+1]+=n; px[i+2]+=n;
+          }
+        },
+        halftone:({size=6})=>{
+          const w=$canvas.width,h=$canvas.height;
+          const src=new Uint8ClampedArray(px);
+          const off=(x,y)=>(y*w+x)*4;
+          for(let y=0;y<h;y+=size){
+            for(let x=0;x<w;x+=size){
+              let sum=0,count=0;
+              for(let j=0;j<size;j++) for(let i=0;i<size;i++){
+                const xx=Math.min(w-1,x+i), yy=Math.min(h-1,y+j);
+                const p=off(xx,yy);
+                const yv=.2126*src[p]+.7152*src[p+1]+.0722*src[p+2];
+                sum+=yv; count++;
+              }
+              const avg=sum/count;
+              for(let j=0;j<size;j++) for(let i=0;i<size;i++){
+                const xx=Math.min(w-1,x+i), yy=Math.min(h-1,y+j);
+                const p=off(xx,yy);
+                const dot = avg>128 ? 255 : 0;
+                px[p]= (src[p]*0.6 + dot*0.4);
+                px[p+1]= (src[p+1]*0.6 + dot*0.4);
+                px[p+2]= (src[p+2]*0.6 + dot*0.4);
+              }
+            }
+          }
+        }
+      };
+
+      for(const step of (f.pipeline||[])){
+        const {op, ...args} = step;
+        if (ops[op]) ops[op](args.value!==undefined ? args.value : args);
+      }
+
+      $ctx.putImageData(imgData,0,0);
+      $meta.textContent = `Filtro: ${f.name}  ·  likes: ${f.likes ?? 0}  ·  created: ${f.created_at}`;
+    }
+
+    // =========================
+    // 7) Pulsante: filtro casuale tra i 5
+    // =========================
+    $btnRandom.onclick = ()=>{
+      if (!SOURCE_IMG) return;
+      const f = FILTERS[Math.floor(Math.random()*FILTERS.length)];
+      applyFilter(f);
+    };
+
+    // =========================
+    // 8) Download risultato
+    // =========================
+    $btnDownload.onclick = ()=>{
+      const url = $canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'filtered.png';
+      a.click();
+    };
+
+    // Reimposta immagine originale
+    $btnReset.onclick = ()=>{
+      if (!SOURCE_IMG) return;
+      fitCanvasToImage(SOURCE_IMG);
+      $ctx.drawImage(SOURCE_IMG, 0, 0, $canvas.width, $canvas.height);
+      $meta.textContent = 'Originale';
+    };
+
+    // =========================
+    // 9) Boot
+    // =========================
+    loadFilters();
+  </script>
+</body>
+</html>
+
+

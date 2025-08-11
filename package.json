@@ -1,0 +1,14 @@
+{
+  "name": "img-filters-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "update:filters": "node scripts/update-filters.mjs",
+    "serve": "python3 -m http.server 5173"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
+
+

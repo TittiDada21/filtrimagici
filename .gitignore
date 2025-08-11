@@ -1,0 +1,14 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Node
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# Vercel/Local
+.vercel/
+.env*
+

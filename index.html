@@ -250,6 +250,7 @@
     let ORIGINAL_MIME = 'image/png';
     let ORIGINAL_NAME = 'image';
     const PREVIEWS = {};
+    let aiWorker = null;
 
     // =========================
     // 3) Caricamento filtri da /filters.json o fallback
@@ -392,6 +393,20 @@
       $ctx.drawImage(SOURCE_IMG, 0, 0, $canvas.width, $canvas.height);
 
       let imgData = $ctx.getImageData(0,0,$canvas.width,$canvas.height);
+
+      // Se è un filtro AI, delega al worker AI (stub temporaneo)
+      if (f.type === 'ai' && f.model) {
+        if (!aiWorker) aiWorker = new Worker('ai-worker.js');
+        aiWorker.onmessage = (e)=>{
+          const { data } = e.data;
+          const out = new ImageData(new Uint8ClampedArray(data), $canvas.width, $canvas.height);
+          $ctx.putImageData(out,0,0);
+          $meta.textContent = `Filtro: ${f.name}  ·  AI model`;
+          CURRENT_FILTER_ID = f.id; updateActiveThumb();
+        };
+        aiWorker.postMessage({ id:f.id, width:$canvas.width, height:$canvas.height, data: imgData.data.buffer, model: f.model }, [imgData.data.buffer]);
+        return;
+      }
       const px = imgData.data;
 
       const clamp01 = v => Math.max(0, Math.min(1, v));

@@ -76,21 +76,26 @@ const CANDIDATES = [
 
 // AI candidates (placeholders con pipeline locale; in futuro sostituire con modelli ONNX/TF.js)
 const AI_CANDIDATES = [
-  { id: 'ai-anime-gan', name: 'AnimeGAN', likes: 120, type: 'ai', family: 'ai-style', pipeline: [
-    { op:'contrast', value:0.12 }, { op:'vibrance', value:0.35 }, { op:'clarity', value:0.12 }
-  ], sources:[{name:'Hugging Face', url:'https://huggingface.co'}]},
-  { id: 'ai-neural-paint', name: 'Neural Paint', likes: 110, type: 'ai', family: 'ai-style', pipeline: [
-    { op:'saturation', value:0.25 }, { op:'splitTone', shadows:{h:210,s:0.22}, highlights:{h:40,s:0.20} }, { op:'grain', value:0.08 }
-  ], sources:[{name:'Hugging Face', url:'https://huggingface.co'}]},
-  { id: 'ai-cyberpunk', name: 'Cyberpunk', likes: 98, type: 'ai', family: 'ai-style', pipeline: [
-    { op:'contrast', value:0.15 }, { op:'hue', value: -25 }, { op:'vignette', value:0.18 }
-  ], sources:[{name:'Hugging Face', url:'https://huggingface.co'}]},
-  { id: 'ai-watercolor', name: 'Watercolor', likes: 95, type: 'ai', family: 'ai-style', pipeline: [
-    { op:'exposure', value:0.06 }, { op:'vibrance', value:0.28 }, { op:'clarity', value:-0.05 }
-  ], sources:[{name:'Hugging Face', url:'https://huggingface.co'}]},
-  { id: 'ai-comic-ink', name: 'Comic Ink', likes: 90, type: 'ai', family: 'ai-style', pipeline: [
-    { op:'grayscale' }, { op:'edge', amount:1.0 }, { op:'contrast', value:0.18 }
-  ], sources:[{name:'Hugging Face', url:'https://huggingface.co'}]}
+  { id: 'ai-style-mosaic', name: 'AI Style: Mosaic', likes: 210, type: 'ai', family: 'ai-style',
+    model: { framework: 'onnx', url: 'https://raw.githubusercontent.com/microsoft/onnxruntime-inference-examples/main/js/FastNeuralStyle/models/mosaic.onnx' },
+    sources:[{name:'ONNX Runtime Examples', url:'https://github.com/microsoft/onnxruntime-inference-examples'}]
+  },
+  { id: 'ai-style-candy', name: 'AI Style: Candy', likes: 205, type: 'ai', family: 'ai-style',
+    model: { framework: 'onnx', url: 'https://raw.githubusercontent.com/microsoft/onnxruntime-inference-examples/main/js/FastNeuralStyle/models/candy.onnx' },
+    sources:[{name:'ONNX Runtime Examples', url:'https://github.com/microsoft/onnxruntime-inference-examples'}]
+  },
+  { id: 'ai-style-udnie', name: 'AI Style: Udnie', likes: 200, type: 'ai', family: 'ai-style',
+    model: { framework: 'onnx', url: 'https://raw.githubusercontent.com/microsoft/onnxruntime-inference-examples/main/js/FastNeuralStyle/models/udnie.onnx' },
+    sources:[{name:'ONNX Runtime Examples', url:'https://github.com/microsoft/onnxruntime-inference-examples'}]
+  },
+  { id: 'ai-style-rain', name: 'AI Style: Rain Princess', likes: 198, type: 'ai', family: 'ai-style',
+    model: { framework: 'onnx', url: 'https://raw.githubusercontent.com/microsoft/onnxruntime-inference-examples/main/js/FastNeuralStyle/models/rain_princess.onnx' },
+    sources:[{name:'ONNX Runtime Examples', url:'https://github.com/microsoft/onnxruntime-inference-examples'}]
+  },
+  { id: 'ai-style-muse', name: 'AI Style: The Muse', likes: 192, type: 'ai', family: 'ai-style',
+    model: { framework: 'onnx', url: 'https://raw.githubusercontent.com/microsoft/onnxruntime-inference-examples/main/js/FastNeuralStyle/models/the_muse.onnx' },
+    sources:[{name:'ONNX Runtime Examples', url:'https://github.com/microsoft/onnxruntime-inference-examples'}]
+  }
 ];
 
 function weekStamp(date = new Date()){

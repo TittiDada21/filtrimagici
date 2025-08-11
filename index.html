@@ -404,6 +404,8 @@
           $meta.textContent = `Filtro AI: ${f.name}  ·  modello: ${f.model.framework.toUpperCase()}`;
           CURRENT_FILTER_ID = f.id; updateActiveThumb();
         };
+        // Mostra stato caricamento
+        $meta.textContent = `Carico modello AI… ${f.name}`;
         aiWorker.postMessage({ id:f.id, width:$canvas.width, height:$canvas.height, data: imgData.data.buffer, model: f.model }, [imgData.data.buffer]);
         return;
       }

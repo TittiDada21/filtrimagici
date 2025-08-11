@@ -51,9 +51,10 @@ self.onmessage = async (e)=>{
   try {
     const session = await getSession(model);
     const input = preprocessRGBAtoCHWFloat32(new Uint8ClampedArray(data), width, height);
-    const feeds = { 'input': new ort.Tensor('float32', input, [1,3,height,width]) };
+    const inputName = (session.inputNames && session.inputNames[0]) || 'input';
+    const feeds = {}; feeds[inputName] = new ort.Tensor('float32', input, [1,3,height,width]);
     const results = await session.run(feeds);
-    const outputName = session.outputNames ? session.outputNames[0] : Object.keys(results)[0];
+    const outputName = (session.outputNames && session.outputNames[0]) || Object.keys(results)[0];
     const outTensor = results[outputName];
     const chw = outTensor.data; // Float32Array 1x3xHxW
     const rgba = postprocessCHWtoRGBA(chw, width, height);

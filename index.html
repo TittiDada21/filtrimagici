@@ -401,7 +401,7 @@
           const { data } = e.data;
           const out = new ImageData(new Uint8ClampedArray(data), $canvas.width, $canvas.height);
           $ctx.putImageData(out,0,0);
-          $meta.textContent = `Filtro: ${f.name}  ·  AI model`;
+          $meta.textContent = `Filtro AI: ${f.name}  ·  modello: ${f.model.framework.toUpperCase()}`;
           CURRENT_FILTER_ID = f.id; updateActiveThumb();
         };
         aiWorker.postMessage({ id:f.id, width:$canvas.width, height:$canvas.height, data: imgData.data.buffer, model: f.model }, [imgData.data.buffer]);

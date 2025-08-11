@@ -1,0 +1,7 @@
+{
+  "crons": [
+    { "path": "/api/update-filters", "schedule": "0 7 * * 1" }
+  ]
+}
+
+

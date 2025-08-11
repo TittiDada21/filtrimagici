@@ -22,9 +22,12 @@
     button.primary{background:var(--acc);color:#052532;border:none}
     /* nuova barra filtri a pillole */
     .thumbs{display:flex;gap:8px;margin-top:8px;overflow-x:auto;padding:6px 2px}
-    .thumb{border-radius:999px;border:1px solid #253146;padding:8px 12px;display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#cfe0f7;background:#141b28;white-space:nowrap}
+    .thumb{border-radius:999px;border:1px solid #253146;padding:8px 12px;display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#cfe0f7;background:#141b28;white-space:nowrap;cursor:pointer;outline:none}
     .thumb:hover{background:#182236}
+    .thumb.active{background:var(--acc); color:#052532; border-color:transparent}
+    .thumb:focus-visible{box-shadow:0 0 0 2px var(--acc)}
     .thumb span{display:inline}
+    .thumb img.mini{width:22px;height:22px;border-radius:4px;object-fit:cover;border:1px solid #253146;background:#0b0f16}
     canvas, img#preview{width:100%;height:auto;border-radius:12px;border:1px solid #253146;background:#0b0f16}
     .muted{color:var(--muted)}
     footer{margin-top:16px;color:#8fa4be;font-size:12px}
@@ -240,6 +243,10 @@
     const $meta = document.getElementById('meta');
     let SOURCE_IMG = null;
     let FILTERS = [];
+    let CURRENT_FILTER_ID = null;
+    let ORIGINAL_MIME = 'image/png';
+    let ORIGINAL_NAME = 'image';
+    const PREVIEWS = {};
 
     // =========================
     // 3) Caricamento filtri da /filters.json o fallback
@@ -266,14 +273,59 @@
     // =========================
     function renderThumbs() {
       $thumbs.innerHTML = '';
-      FILTERS.forEach(f => {
+      FILTERS.forEach((f,idx) => {
         const d = document.createElement('div');
         d.className = 'thumb';
-        d.innerHTML = `<div>🧪</div><span>${f.name}</span>`;
+        d.setAttribute('role','button');
+        d.setAttribute('tabindex','0');
+        d.dataset.id = f.id;
+        const mini = PREVIEWS[f.id] ? `<img class="mini" src="${PREVIEWS[f.id]}" alt="" />` : '<img class="mini" alt="" />';
+        d.innerHTML = `${mini}<span>${f.name}</span>`;
         d.title = `likes: ${f.likes ?? 0}  ·  created: ${f.created_at}`;
         d.onclick = () => applyFilter(f);
+        d.onkeydown = (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); applyFilter(f);} };
         $thumbs.appendChild(d);
       });
+      updateActiveThumb();
+    }
+
+    // Genera miniature in worker (non blocca la UI) – opzionale futura estensione
+    let worker = null;
+    const listeners = new Map();
+    function ensureWorker(){
+      if(!worker){
+        worker = new Worker('preview-worker.js');
+        worker.onmessage = (e)=>{
+          const { id, width, height, data } = e.data;
+          const c = document.createElement('canvas'); c.width=width; c.height=height;
+          const ctx = c.getContext('2d');
+          const imgData = new ImageData(new Uint8ClampedArray(data), width, height);
+          ctx.putImageData(imgData,0,0);
+          const url = c.toDataURL('image/png');
+          PREVIEWS[id] = url;
+          const el = $thumbs.querySelector(`.thumb[data-id="${id}"] img.mini`);
+          if (el) el.src = url;
+          const fn = listeners.get(id); if(fn) { fn(url); listeners.delete(id); }
+        };
+      }
+      return worker;
+    }
+
+    function generatePreview(filter){
+      if(!SOURCE_IMG) return;
+      const w = 120; const r = w / (SOURCE_IMG.naturalWidth || SOURCE_IMG.width);
+      const h = Math.max(1, Math.round((SOURCE_IMG.naturalHeight || SOURCE_IMG.height) * r));
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const ctx = c.getContext('2d'); ctx.imageSmoothingQuality='high';
+      ctx.drawImage(SOURCE_IMG, 0, 0, w, h);
+      const imgData = ctx.getImageData(0,0,w,h);
+      ensureWorker().postMessage({ id: filter.id, width:w, height:h, data: imgData.data.buffer, pipeline: filter.pipeline }, [imgData.data.buffer]);
+      return new Promise(res=> listeners.set(filter.id, res));
+    }
+
+    function queueAllPreviews(){
+      if(!FILTERS || !FILTERS.length || !SOURCE_IMG) return;
+      FILTERS.forEach(f=> generatePreview(f));
     }
 
     // =========================
@@ -310,18 +362,19 @@
         $btnRandom.disabled = false;
         $btnReset.disabled = false;
         $btnDownload.disabled = false;
-        $meta.textContent = '';
+        ORIGINAL_MIME = file.type || 'image/png';
+        ORIGINAL_NAME = file.name || 'image';
+        $meta.textContent = `${$canvas.width}×${$canvas.height} · ${ORIGINAL_MIME}`;
+        queueAllPreviews();
         URL.revokeObjectURL(url);
       };
       img.src = url;
     }
 
     function fitCanvasToImage(img){
-      const maxW = 900, maxH = 900;
-      let { width:w, height:h } = img;
-      const r = Math.min(maxW / w, maxH / h, 1);
-      $canvas.width = Math.round(w * r);
-      $canvas.height = Math.round(h * r);
+      // Massima qualità: mantieni la risoluzione originale dell'immagine
+      $canvas.width = img.naturalWidth || img.width;
+      $canvas.height = img.naturalHeight || img.height;
     }
 
     // =========================
@@ -336,6 +389,24 @@
       const px = imgData.data;
 
       const clamp01 = v => Math.max(0, Math.min(1, v));
+      const cyrb53 = (str, seed = 0) => {
+        let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+        for (let i = 0, ch; i < str.length; i++) {
+          ch = str.charCodeAt(i);
+          h1 = Math.imul(h1 ^ ch, 2654435761);
+          h2 = Math.imul(h2 ^ ch, 1597334677);
+        }
+        h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+        h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+        return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+      };
+      const mulberry32 = (a) => () => {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        let t = Math.imul(a ^ a >>> 15, 1 | a);
+        t ^= t + Math.imul(t ^ t >>> 7, 61 | t);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+      const rand = mulberry32(cyrb53(f.id || 'seed'));
       const rgb2hsv = (r,g,b)=>{
         r/=255; g/=255; b/=255;
         const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
@@ -492,7 +563,7 @@
         },
         grain:(v)=>{
           for(let i=0;i<px.length;i+=4){
-            const n = (Math.random()*2-1)*v*50;
+            const n = (rand()*2-1)*v*50;
             px[i]+=n; px[i+1]+=n; px[i+2]+=n;
           }
         },
@@ -530,6 +601,21 @@
 
       $ctx.putImageData(imgData,0,0);
       $meta.textContent = `Filtro: ${f.name}  ·  likes: ${f.likes ?? 0}  ·  created: ${f.created_at}`;
+      CURRENT_FILTER_ID = f.id;
+      updateActiveThumb();
+    }
+
+    function updateActiveThumb(){
+      const nodes = $thumbs.querySelectorAll('.thumb');
+      nodes.forEach(n=>{
+        if(n.dataset.id === CURRENT_FILTER_ID){
+          n.classList.add('active');
+          n.setAttribute('aria-pressed','true');
+        } else {
+          n.classList.remove('active');
+          n.setAttribute('aria-pressed','false');
+        }
+      });
     }
 
     // =========================
@@ -541,15 +627,30 @@
       applyFilter(f);
     };
 
+    // Navigazione con tastiera tra filtri
+    document.addEventListener('keydown', (e)=>{
+      if(!SOURCE_IMG) return;
+      if(e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      if(!FILTERS.length) return;
+      const idx = Math.max(0, FILTERS.findIndex(x=> x.id===CURRENT_FILTER_ID));
+      const next = e.key==='ArrowRight' ? (idx+1) % FILTERS.length : (idx-1+FILTERS.length) % FILTERS.length;
+      applyFilter(FILTERS[next]);
+    });
+
     // =========================
     // 8) Download risultato
     // =========================
     $btnDownload.onclick = ()=>{
-      const url = $canvas.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'filtered.png';
-      a.click();
+      const mime = ORIGINAL_MIME && ORIGINAL_MIME.startsWith('image/jpeg') ? 'image/jpeg' : 'image/png';
+      $canvas.toBlob((blob)=>{
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const ext = mime==='image/jpeg' ? 'jpg' : 'png';
+        a.download = `${(ORIGINAL_NAME||'filtered').replace(/\.[^.]+$/, '')}.${ext}`;
+        a.click();
+        setTimeout(()=> URL.revokeObjectURL(a.href), 2000);
+      }, mime, mime==='image/jpeg' ? 0.98 : undefined);
     };
 
     // Reimposta immagine originale

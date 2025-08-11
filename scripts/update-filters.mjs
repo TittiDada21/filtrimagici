@@ -12,7 +12,25 @@ const SOURCES = [
   { name: 'OpenCV tutorials', url: 'https://www.geeksforgeeks.org/opencv-python-tutorial/' }
 ];
 
-// Preset candidati. Manteniamo 12 e poi selezioniamo i 10 più "nuovi" per rotazione settimanale.
+// Adapter minimi: sostituibili con fetch/scraping reali
+const adapters = {
+  filterous2: async () => ([
+    { id: 'fresh-contrast', name: 'Fresh Contrast', likes: 57, family: 'contrast' },
+    { id: 'teal-boost', name: 'Teal Boost', likes: 83, family: 'teal' },
+    { id: 'warm-film-grain', name: 'Warm Film Grain', likes: 77, family: 'film' },
+  ]),
+  pilgram: async () => ([
+    { id: 'ink-sketch-lite', name: 'Ink Sketch', likes: 76, family: 'mono' },
+    { id: 'noir-edges', name: 'Noir Edges', likes: 48, family: 'mono' },
+  ]),
+  opencv: async () => ([
+    { id: 'pop-halftone', name: 'Pop Halftone', likes: 72, family: 'pattern' },
+    { id: 'vivid-halftone', name: 'Vivid Halftone', likes: 68, family: 'pattern' },
+    { id: 'cool-ink', name: 'Cool Ink', likes: 53, family: 'mono' },
+  ])
+};
+
+// Preset candidati base
 const CANDIDATES = [
   { id: 'fresh-contrast', name: 'Fresh Contrast', likes: 57, pipeline: [
       { op: 'contrast', value: 0.12 }, { op: 'vibrance', value: 0.30 }, { op: 'vignette', value: 0.22 }
@@ -63,13 +81,46 @@ function weekStamp(date = new Date()){
 async function main(){
   const now = new Date();
   const stamp = weekStamp(now);
-  // Ordiniamo per likes e ruotiamo per settimana per dare varietà
-  const sorted = [...CANDIDATES].sort((a,b)=> (b.likes||0)-(a.likes||0));
-  const offset = (now.getWeekOffset = parseInt(stamp.slice(-2),10)) % sorted.length;
-  const rotated = sorted.slice(offset).concat(sorted.slice(0, offset));
+  // 1) aggrega dai piccoli adapter + base locale
+  const fromAdapters = [
+    ...(await adapters.filterous2()),
+    ...(await adapters.pilgram()),
+    ...(await adapters.opencv())
+  ];
+  const pool = [...CANDIDATES, ...fromAdapters]
+    .map(x => ({...x, created_at: now.toISOString().slice(0,10)}));
+
+  // 2) ranking: likes + diversity penalty per family
+  const familyCount = {};
+  const scored = pool
+    .sort((a,b)=> (b.likes||0)-(a.likes||0))
+    .map(f => {
+      const fam = f.family || 'misc';
+      const penalty = (familyCount[fam]||0) * 5; // penalizza ripetizioni
+      const score = (f.likes||0) - penalty;
+      familyCount[fam] = (familyCount[fam]||0) + 1;
+      return { ...f, score };
+    })
+    .sort((a,b)=> b.score - a.score);
+
+  // 3) rotazione deterministica settimanale
+  const offset = parseInt(stamp.slice(-2),10) % scored.length;
+  const rotated = scored.slice(offset).concat(scored.slice(0, offset));
   const chosen = rotated.slice(0, 10).map(f => ({
     ...f,
-    created_at: `${now.toISOString().slice(0,10)}`,
+    pipeline: f.pipeline || (
+      f.family === 'contrast' ? [
+        { op:'contrast', value:0.12 }, { op:'vibrance', value:0.30 }, { op:'vignette', value:0.22 }
+      ] : f.family === 'teal' ? [
+        { op:'vibrance', value:0.35 }, { op:'hue', value:10 }, { op:'clarity', value:0.10 }
+      ] : f.family === 'film' ? [
+        { op:'exposure', value:-0.03 }, { op:'warmth', value:0.20 }, { op:'grain', value:0.18 }
+      ] : f.family === 'mono' ? [
+        { op:'grayscale' }, { op:'edge', amount:1.0 }, { op:'levels', low:0.15, high:0.9 }
+      ] : f.family === 'pattern' ? [
+        { op:'saturation', value:0.25 }, { op:'halftone', size:6 }, { op:'contrast', value:0.15 }
+      ] : [ { op:'contrast', value:0.08 } ]
+    ),
     sources: SOURCES
   }));
 

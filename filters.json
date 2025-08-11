@@ -76,16 +76,19 @@
       ]
     },
     {
-      "id": "film-noir",
-      "name": "Film Noir",
+      "id": "sunburn-glow",
+      "name": "Sunburn Glow",
       "likes": 94,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": -0.2 },
-        { "op": "contrast", "value": 0.4 },
-        { "op": "grayscale", "value": 1.0 },
-        { "op": "levels", "low": 0.05, "high": 0.9 },
-        { "op": "vignette", "value": 0.45 }
+        { "op": "exposure", "value": 0.3 },
+        { "op": "contrast", "value": 0.5 },
+        { "op": "saturation", "value": 0.8 },
+        { "op": "warmth", "value": 0.6 },
+        { "op": "hue", "value": 0.05 },
+        { "op": "vibrance", "value": 0.7 },
+        { "op": "clarity", "value": 0.3 },
+        { "op": "vignette", "value": 0.4 }
       ],
       "sources": [
         { "name": "Filterous2", "url": "https://github.com/icarusion/Filterous2" }

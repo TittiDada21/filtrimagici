@@ -92,27 +92,40 @@ async function main(){
     ...(await adapters.opencv())
   ];
   const threeMonthsAgo = new Date(now); threeMonthsAgo.setMonth(now.getMonth()-3);
-  const pool = [...CANDIDATES, ...fromAdapters]
+  const raw = [...CANDIDATES, ...fromAdapters]
     .map(x => ({...x, created_at: now.toISOString().slice(0,10)}))
-    // filtro temporalità: ultimi ~3 mesi
     .filter(x => new Date(x.created_at) >= threeMonthsAgo);
 
-  // 2) ranking: likes + dissimilarità tra selezionati (diversità forte)
-  function cosineSim(a,b){
-    const fams = ['contrast','teal','film','mono','pattern','misc'];
-    const va = fams.map(f => (a.family===f?1:0));
-    const vb = fams.map(f => (b.family===f?1:0));
-    const dot = va.reduce((s,v,i)=> s+v*vb[i],0);
-    const na = Math.sqrt(va.reduce((s,v)=> s+v*v,0));
-    const nb = Math.sqrt(vb.reduce((s,v)=> s+v*v,0));
-    return dot/(na*nb||1);
+  // 0) dedup per id e nome normalizzato — tiene quello con più likes
+  const slug = s => (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  const seen = new Map();
+  for(const f of raw){
+    const key = f.id || slug(f.name);
+    const curr = seen.get(key);
+    if(!curr || (f.likes||0) > (curr.likes||0)){
+      seen.set(key, { ...f, id: key, name: f.name || key.replace(/-/g,' ') });
+    }
   }
+  const pool = Array.from(seen.values());
+
+  // 2) ranking: likes + dissimilarità tra selezionati (diversità forte)
+  // Similarità basata su set delle operazioni (Jaccard)
+  const opsSet = f => new Set((f.pipeline||[]).map(s=>s.op));
+  const jaccard = (a,b)=>{
+    const A=opsSet(a), B=opsSet(b);
+    const inter=[...A].filter(x=>B.has(x)).length;
+    const uni = new Set([...A,...B]).size;
+    return uni===0?0:inter/uni;
+  };
+
   const baseRank = [...pool].sort((a,b)=> (b.likes||0)-(a.likes||0));
   const picked = [];
   for(const cand of baseRank){
     if(picked.length>=10) break;
-    const similar = picked.some(p => cosineSim(p,cand) > 0.8);
-    if(similar) continue; // scarta se troppo simile a uno già preso
+    const sameName = picked.some(p => slug(p.name) === slug(cand.name));
+    const sameId = picked.some(p => p.id === cand.id);
+    const tooSimilar = picked.some(p => jaccard(p,cand) > 0.6); // evita pipeline troppo simili
+    if(sameName || sameId || tooSimilar) continue;
     picked.push(cand);
   }
   const scored = picked;

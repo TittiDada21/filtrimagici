@@ -15,18 +15,18 @@ const SOURCES = [
 // Adapter minimi: sostituibili con fetch/scraping reali
 const adapters = {
   filterous2: async () => ([
-    { id: 'fresh-contrast', name: 'Fresh Contrast', likes: 57, family: 'contrast' },
-    { id: 'teal-boost', name: 'Teal Boost', likes: 83, family: 'teal' },
-    { id: 'warm-film-grain', name: 'Warm Film Grain', likes: 77, family: 'film' },
+    { id: 'fresh-contrast', name: 'Fresh Contrast', likes: 57, family: 'contrast', type: 'classic' },
+    { id: 'teal-boost', name: 'Teal Boost', likes: 83, family: 'teal', type: 'classic' },
+    { id: 'warm-film-grain', name: 'Warm Film Grain', likes: 77, family: 'film', type: 'classic' },
   ]),
   pilgram: async () => ([
-    { id: 'ink-sketch-lite', name: 'Ink Sketch', likes: 76, family: 'mono' },
-    { id: 'noir-edges', name: 'Noir Edges', likes: 48, family: 'mono' },
+    { id: 'ink-sketch-lite', name: 'Ink Sketch', likes: 76, family: 'mono', type: 'classic' },
+    { id: 'noir-edges', name: 'Noir Edges', likes: 48, family: 'mono', type: 'classic' },
   ]),
   opencv: async () => ([
-    { id: 'pop-halftone', name: 'Pop Halftone', likes: 72, family: 'pattern' },
-    { id: 'vivid-halftone', name: 'Vivid Halftone', likes: 68, family: 'pattern' },
-    { id: 'cool-ink', name: 'Cool Ink', likes: 53, family: 'mono' },
+    { id: 'pop-halftone', name: 'Pop Halftone', likes: 72, family: 'pattern', type: 'classic' },
+    { id: 'vivid-halftone', name: 'Vivid Halftone', likes: 68, family: 'pattern', type: 'classic' },
+    { id: 'cool-ink', name: 'Cool Ink', likes: 53, family: 'mono', type: 'classic' },
   ])
 };
 
@@ -34,44 +34,63 @@ const adapters = {
 const CANDIDATES = [
   { id: 'fresh-contrast', name: 'Fresh Contrast', likes: 57, pipeline: [
       { op: 'contrast', value: 0.12 }, { op: 'vibrance', value: 0.30 }, { op: 'vignette', value: 0.22 }
-  ]},
+  ], type: 'classic', family: 'contrast' },
   { id: 'teal-boost', name: 'Teal Boost', likes: 83, pipeline: [
       { op: 'vibrance', value: 0.35 }, { op: 'hue', value: 10 }, { op: 'clarity', value: 0.10 }
-  ]},
+  ], type: 'classic', family: 'teal' },
   { id: 'film-soft-warm', name: 'Film Soft Warm', likes: 44, pipeline: [
       { op: 'exposure', value: -0.04 }, { op: 'contrast', value: 0.08 }, { op: 'warmth', value: 0.18 }
-  ]},
+  ], type: 'classic', family: 'film' },
   { id: 'mono-edges', name: 'Mono Edges', likes: 65, pipeline: [
       { op: 'grayscale' }, { op: 'edge', amount: 1.0 }, { op: 'levels', low: 0.15, high: 0.90 }
-  ]},
+  ], type: 'classic', family: 'mono' },
   { id: 'pop-halftone', name: 'Pop Halftone', likes: 72, pipeline: [
       { op: 'saturation', value: 0.25 }, { op: 'halftone', size: 6 }, { op: 'contrast', value: 0.15 }
-  ]},
+  ], type: 'classic', family: 'pattern' },
   { id: 'cinematic-tealorange-lite', name: 'Cinematic Teal/Orange', likes: 91, pipeline: [
       { op: 'contrast', value: 0.10 }, { op: 'splitTone', shadows: {h:200,s:0.22}, highlights:{h:35,s:0.18} }, { op: 'clarity', value: 0.08 }
-  ]},
+  ], type: 'classic', family: 'teal' },
   { id: 'noir-edges', name: 'Noir Edges', likes: 48, pipeline: [
       { op: 'grayscale' },
       { op: 'contrast', value: 0.25 },
       { op: 'clarity', value: 0.2 },
       { op: 'vignette', value: 0.2 },
       { op: 'grain', value: 0.1 }
-  ]},
+  ], type: 'classic', family: 'mono' },
   { id: 'warm-film-grain', name: 'Warm Film Grain', likes: 77, pipeline: [
       { op: 'exposure', value: -0.03 }, { op: 'warmth', value: 0.20 }, { op: 'grain', value: 0.18 }
-  ]},
+  ], type: 'classic', family: 'film' },
   { id: 'cool-ink', name: 'Cool Ink', likes: 53, pipeline: [
       { op: 'grayscale' }, { op: 'hue', value: 188 }, { op: 'contrast', value: 0.09 }
-  ]},
+  ], type: 'classic', family: 'mono' },
   { id: 'vivid-halftone', name: 'Vivid Halftone', likes: 68, pipeline: [
       { op: 'saturation', value: 0.30 }, { op: 'halftone', size: 5 }, { op: 'contrast', value: 0.12 }
-  ]},
+  ], type: 'classic', family: 'pattern' },
   { id: 'neon-noise-v1', name: 'Neon Noise', likes: 120, pipeline: [
       { op: 'exposure', value: 0.08 }, { op: 'vibrance', value: 0.35 }, { op: 'hue', value: 12 }, { op: 'contrast', value: 0.12 }, { op: 'grain', value: 0.15 }
-  ]},
+  ], type: 'classic', family: 'teal' },
   { id: 'ink-sketch-lite', name: 'Ink Sketch', likes: 76, pipeline: [
       { op: 'grayscale' }, { op: 'edge', amount: 1.0 }, { op: 'levels', low: 0.15, high: 0.90 }
-  ]}
+  ], type: 'classic', family: 'mono' }
+];
+
+// AI candidates (placeholders con pipeline locale; in futuro sostituire con modelli ONNX/TF.js)
+const AI_CANDIDATES = [
+  { id: 'ai-anime-gan', name: 'AnimeGAN', likes: 120, type: 'ai', family: 'ai-style', pipeline: [
+    { op:'contrast', value:0.12 }, { op:'vibrance', value:0.35 }, { op:'clarity', value:0.12 }
+  ], sources:[{name:'Hugging Face', url:'https://huggingface.co'}]},
+  { id: 'ai-neural-paint', name: 'Neural Paint', likes: 110, type: 'ai', family: 'ai-style', pipeline: [
+    { op:'saturation', value:0.25 }, { op:'splitTone', shadows:{h:210,s:0.22}, highlights:{h:40,s:0.20} }, { op:'grain', value:0.08 }
+  ], sources:[{name:'Hugging Face', url:'https://huggingface.co'}]},
+  { id: 'ai-cyberpunk', name: 'Cyberpunk', likes: 98, type: 'ai', family: 'ai-style', pipeline: [
+    { op:'contrast', value:0.15 }, { op:'hue', value: -25 }, { op:'vignette', value:0.18 }
+  ], sources:[{name:'Hugging Face', url:'https://huggingface.co'}]},
+  { id: 'ai-watercolor', name: 'Watercolor', likes: 95, type: 'ai', family: 'ai-style', pipeline: [
+    { op:'exposure', value:0.06 }, { op:'vibrance', value:0.28 }, { op:'clarity', value:-0.05 }
+  ], sources:[{name:'Hugging Face', url:'https://huggingface.co'}]},
+  { id: 'ai-comic-ink', name: 'Comic Ink', likes: 90, type: 'ai', family: 'ai-style', pipeline: [
+    { op:'grayscale' }, { op:'edge', amount:1.0 }, { op:'contrast', value:0.18 }
+  ], sources:[{name:'Hugging Face', url:'https://huggingface.co'}]}
 ];
 
 function weekStamp(date = new Date()){
@@ -92,7 +111,7 @@ async function main(){
     ...(await adapters.opencv())
   ];
   const threeMonthsAgo = new Date(now); threeMonthsAgo.setMonth(now.getMonth()-3);
-  const raw = [...CANDIDATES, ...fromAdapters]
+  const raw = [...CANDIDATES, ...fromAdapters, ...AI_CANDIDATES]
     .map(x => ({...x, created_at: now.toISOString().slice(0,10)}))
     .filter(x => new Date(x.created_at) >= threeMonthsAgo);
 
@@ -119,16 +138,21 @@ async function main(){
   };
 
   const baseRank = [...pool].sort((a,b)=> (b.likes||0)-(a.likes||0));
-  const picked = [];
+  const pickedClassic = [];
+  const pickedAI = [];
   for(const cand of baseRank){
-    if(picked.length>=10) break;
+    if(pickedClassic.length>=5 && pickedAI.length>=5) break;
     const sameName = picked.some(p => slug(p.name) === slug(cand.name));
     const sameId = picked.some(p => p.id === cand.id);
     const tooSimilar = picked.some(p => jaccard(p,cand) > 0.6); // evita pipeline troppo simili
     if(sameName || sameId || tooSimilar) continue;
-    picked.push(cand);
+    if (cand.type === 'ai') {
+      if (pickedAI.length < 5) pickedAI.push(cand);
+    } else {
+      if (pickedClassic.length < 5) pickedClassic.push(cand);
+    }
   }
-  const scored = picked;
+  const scored = [...pickedClassic, ...pickedAI];
 
   // 3) rotazione deterministica settimanale
   const offset = parseInt(stamp.slice(-2),10) % scored.length;

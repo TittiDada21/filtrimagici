@@ -629,8 +629,18 @@
     // =========================
     $btnRandom.onclick = ()=>{
       if (!SOURCE_IMG) return;
-      const f = FILTERS[Math.floor(Math.random()*FILTERS.length)];
-      applyFilter(f);
+      if (!FILTERS || !FILTERS.length) return;
+      let idx = 0;
+      if (FILTERS.length === 1) {
+        idx = 0;
+      } else {
+        for (let i = 0; i < 5; i++) {
+          const r = Math.floor(Math.random() * FILTERS.length);
+          if (FILTERS[r].id !== CURRENT_FILTER_ID) { idx = r; break; }
+          idx = (r + 1) % FILTERS.length;
+        }
+      }
+      applyFilter(FILTERS[idx]);
     };
 
     // Navigazione con tastiera tra filtri

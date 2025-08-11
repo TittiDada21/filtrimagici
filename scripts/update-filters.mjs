@@ -142,9 +142,10 @@ async function main(){
   const pickedAI = [];
   for(const cand of baseRank){
     if(pickedClassic.length>=5 && pickedAI.length>=5) break;
-    const sameName = picked.some(p => slug(p.name) === slug(cand.name));
-    const sameId = picked.some(p => p.id === cand.id);
-    const tooSimilar = picked.some(p => jaccard(p,cand) > 0.6); // evita pipeline troppo simili
+    const poolPicked = [...pickedClassic, ...pickedAI];
+    const sameName = poolPicked.some(p => slug(p.name) === slug(cand.name));
+    const sameId = poolPicked.some(p => p.id === cand.id);
+    const tooSimilar = poolPicked.some(p => jaccard(p,cand) > 0.6); // evita pipeline troppo simili
     if(sameName || sameId || tooSimilar) continue;
     if (cand.type === 'ai') {
       if (pickedAI.length < 5) pickedAI.push(cand);

@@ -115,49 +115,56 @@
     <details class="panel">
       <summary>Schema e automazione di filters.json</summary>
       <div class="panel-body prose">
-        <p>Questa demo legge <strong>10 filtri</strong> da <code>filters.json</code> alla root del progetto. Se il file non è presente, usa un fallback locale. Tutto gira in locale nel browser (zero upload).</p>
-        <h3>Schema</h3>
-        <pre><code>{
-  "filters": [
-    {
-      "id": "unique-id",
-      "name": "Display name",
-      "likes": 42,
-      "created_at": "2025-08-11",
-      "pipeline": [
-        { "op": "contrast", "value": 0.12 },
-        { "op": "vibrance", "value": 0.30 },
-        { "op": "vignette", "value": 0.20 }
-      ],
-      "sources": [
-        { "name": "Filterous2", "url": "https://github.com/icarusion/Filterous2" },
-        { "name": "pilgram", "url": "https://github.com/akiomik/pilgram" },
-        { "name": "OpenCV tutorials", "url": "https://www.geeksforgeeks.org/opencv-python-tutorial/" }
-      ]
-    }
-  ]
-}</code></pre>
-        <p class="muted small">Operazioni supportate: <code>exposure</code>, <code>contrast</code>, <code>vibrance</code>, <code>saturation</code>, <code>hue</code>, <code>warmth</code>, <code>levels</code>, <code>grayscale</code>, <code>edge</code>, <code>splitTone</code>, <code>clarity</code>, <code>vignette</code>, <code>grain</code>, <code>halftone</code>.</p>
-        <h3>Aggiornamento settimanale (README veloce)</h3>
-        <ol>
-          <li>Prerequisiti: Node 18+.</li>
-          <li>Installa le dipendenze: <code>npm i</code>.</li>
-          <li>Genera/aggiorna i 10 filtri: <code>npm run update:filters</code>.
-            <br/><span class="muted small">Lo script crea preset ispirati a <em>Filterous2</em>, <em>pilgram</em> e pattern <em>OpenCV</em>, selezionati per likes e <em>ruotati</em> in modo deterministico in base al numero di settimana.</span>
-          </li>
-          <li>Servi in locale: <code>npm run serve</code> (o <code>python3 -m http.server 5173</code>).</li>
-        </ol>
-        <h3>Automazione</h3>
+        <p><strong>Struttura:</strong></p>
         <ul>
-          <li><strong>GitHub Actions</strong>: esegui <code>npm run update:filters</code> 1×/settimana e committa il file generato.</li>
-          <li><strong>Vercel Cron</strong>: job che lancia uno script serverless che salva il JSON su Blob/KV e la app lo legge da lì.</li>
+          <li><code>id</code>: identificativo univoco</li>
+          <li><code>name</code>: nome visualizzato</li>
+          <li><code>likes</code>: popolarità (≥10 per selezione)</li>
+          <li><code>created_at</code>: data creazione (ultimi 3 mesi)</li>
+          <li><code>pipeline</code>: sequenza operazioni</li>
+          <li><code>sources</code>: fonti e crediti</li>
         </ul>
-        <h3>Note</h3>
+        
+        <p><strong>Operazioni disponibili:</strong></p>
         <ul>
-          <li>La UI filtra comunque i preset con <code>likes ≥ 10</code> e prende i più recenti (max 10).</li>
-          <li>Per aggiungere nuovi stili, modifica <code>scripts/update-filters.mjs</code> (array <code>CANDIDATES</code> o logica di ranking).</li>
-          <li>Privacy: nessuna immagine lascia il browser.</li>
+          <li><code>exposure</code>: luminosità generale</li>
+          <li><code>contrast</code>: contrasto</li>
+          <li><code>vibrance</code>: saturazione intelligente</li>
+          <li><code>saturation</code>: saturazione globale</li>
+          <li><code>hue</code>: tonalità (0-1)</li>
+          <li><code>warmth</code>: temperatura colore</li>
+          <li><code>levels</code>: {low, high} per mappatura toni</li>
+          <li><code>grayscale</code>: conversione B&W</li>
+          <li><code>edge</code>: {amount} per rilevamento bordi</li>
+          <li><code>splitTone</code>: {shadows: {h, s}, highlights: {h, s}}</li>
+          <li><code>clarity</code>: sharpening/unsharp mask</li>
+          <li><code>vignette</code>: oscuramento bordi</li>
+          <li><code>grain</code>: texture filmica</li>
+          <li><code>halftone</code>: {size} per pattern stampa</li>
         </ul>
+        
+        <p><strong>Regole selezione automatica:</strong></p>
+        <ul>
+          <li><strong>Recency</strong>: solo filtri ultimi 3 mesi</li>
+          <li><strong>Popularity</strong>: likes ≥ 10</li>
+          <li><strong>Diversity</strong>: pipeline diverse per massima varietà</li>
+          <li><strong>Source</strong>: tutti da Filterous2 (libreria consolidata)</li>
+        </ul>
+        
+        <p><strong>Layout:</strong></p>
+        <ul>
+          <li><strong>Colonna sinistra</strong>: 5 filtri classici (Vintage Warm, Dramatic B&W, Cyberpunk, Soft Portrait, Urban Grit)</li>
+          <li><strong>Colonna destra</strong>: 5 filtri avanzati (Film Noir, Pastel Dream, Sunset Glow, Cool Blue, Vintage Fade)</li>
+        </ul>
+        
+        <p><strong>Automazione:</strong></p>
+        <ul>
+          <li><strong>Script Node.js</strong>: <code>scripts/update-filters.mjs</code></li>
+          <li><strong>GitHub Actions</strong>: aggiornamento settimanale automatico</li>
+          <li><strong>Vercel Cron</strong>: alternativa serverless (opzionale)</li>
+        </ul>
+        
+        <p><strong>Comando manuale:</strong> <code>npm run update:filters</code></p>
       </div>
     </details>
 

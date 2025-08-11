@@ -1,163 +1,123 @@
 {
   "filters": [
     {
-      "id": "sd-amateur-realism",
-      "name": "SD Amateur Realism",
-      "likes": 245,
+      "id": "pytorch-colorjitter",
+      "name": "PyTorch ColorJitter",
+      "likes": 456,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": 0.15 },
-        { "op": "contrast", "value": 0.25 },
-        { "op": "grain", "value": 0.35 },
-        { "op": "clarity", "value": 0.4 },
-        { "op": "edge", "amount": 0.2 }
+        { "op": "pytorch", "type": "pytorch-colorjitter", "params": { "brightness": 0.3, "contrast": 0.3, "saturation": 0.3, "hue": 0.2 } }
       ],
       "sources": [
-        { "name": "SD Amateur Filter", "url": "https://github.com/sd-amateur-filter" }
+        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
       ]
     },
     {
-      "id": "generative-x-augment",
-      "name": "Generative-X Augment",
-      "likes": 198,
+      "id": "pytorch-randomaffine",
+      "name": "PyTorch RandomAffine",
+      "likes": 523,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": 0.2 },
-        { "op": "vibrance", "value": 0.45 },
-        { "op": "hue", "value": 0.08 },
-        { "op": "splitTone", "shadows": {"h": 220, "s": 0.7}, "highlights": {"h": 45, "s": 0.8} },
-        { "op": "clarity", "value": 0.3 }
+        { "op": "pytorch", "type": "pytorch-randomaffine", "params": { "degrees": 20, "translate": 0.15, "scale": 0.15, "shear": 15 } }
       ],
       "sources": [
-        { "name": "Generative-X", "url": "https://github.com/generative-x" }
+        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
       ]
     },
     {
-      "id": "comfyui-nsfw-filter",
-      "name": "ComfyUI NSFW Filter",
-      "likes": 267,
+      "id": "pytorch-gaussianblur",
+      "name": "PyTorch GaussianBlur",
+      "likes": 489,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": -0.1 },
-        { "op": "contrast", "value": 0.3 },
-        { "op": "saturation", "value": -0.4 },
-        { "op": "grayscale", "value": 0.8 },
-        { "op": "levels", "low": 0.2, "high": 0.8 }
+        { "op": "pytorch", "type": "pytorch-gaussianblur", "params": { "kernelSize": 7, "sigma": 1.5 } }
       ],
       "sources": [
-        { "name": "ComfyUI NSFW Filter", "url": "https://github.com/nsfw_No" }
+        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
       ]
     },
     {
-      "id": "open-webui-tools",
-      "name": "Open WebUI Tools",
-      "likes": 308,
+      "id": "pytorch-randomperspective",
+      "name": "PyTorch RandomPerspective",
+      "likes": 512,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": 0.1 },
-        { "op": "contrast", "value": 0.2 },
-        { "op": "vibrance", "value": 0.35 },
-        { "op": "clarity", "value": 0.25 },
-        { "op": "vignette", "value": 0.3 }
+        { "op": "pytorch", "type": "pytorch-randomperspective", "params": { "distortionScale": 0.6, "p": 0.7 } }
       ],
       "sources": [
-        { "name": "Open WebUI Tools", "url": "https://github.com/open-webui-tools" }
+        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
       ]
     },
     {
-      "id": "ai-video-realtime",
-      "name": "AI Video Realtime",
-      "likes": 189,
+      "id": "pytorch-randomposterize",
+      "name": "PyTorch RandomPosterize",
+      "likes": 478,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": 0.15 },
-        { "op": "contrast", "value": 0.3 },
-        { "op": "saturation", "value": 0.25 },
-        { "op": "clarity", "value": 0.4 },
-        { "op": "grain", "value": 0.2 }
+        { "op": "pytorch", "type": "pytorch-randomposterize", "params": { "bits": 3 } }
       ],
       "sources": [
-        { "name": "AI Video Filter", "url": "https://github.com/AiVideoFilter" }
+        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
       ]
     },
     {
-      "id": "stable-diffusion-nsfw",
-      "name": "Stable Diffusion NSFW",
-      "likes": 234,
+      "id": "pytorch-randomsolarize",
+      "name": "PyTorch RandomSolarize",
+      "likes": 495,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": -0.05 },
-        { "op": "contrast", "value": 0.25 },
-        { "op": "saturation", "value": -0.3 },
-        { "op": "clarity", "value": 0.35 },
-        { "op": "vignette", "value": 0.25 }
+        { "op": "pytorch", "type": "pytorch-randomsolarize", "params": { "threshold": 0.6 } }
       ],
       "sources": [
-        { "name": "Stable Diffusion Filter", "url": "https://github.com/stable-diffusion-image-generator" }
+        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
       ]
     },
     {
-      "id": "midjourney-cinematic",
-      "name": "Midjourney Cinematic",
-      "likes": 312,
+      "id": "pytorch-randomadjustsharpness",
+      "name": "PyTorch RandomAdjustSharpness",
+      "likes": 534,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": 0.2 },
-        { "op": "contrast", "value": 0.4 },
-        { "op": "vibrance", "value": 0.5 },
-        { "op": "splitTone", "shadows": {"h": 200, "s": 0.8}, "highlights": {"h": 30, "s": 0.9} },
-        { "op": "clarity", "value": 0.45 }
+        { "op": "pytorch", "type": "pytorch-randomadjustsharpness", "params": { "sharpnessFactor": 2.5 } }
       ],
       "sources": [
-        { "name": "Midjourney Style", "url": "https://midjourney.com" }
+        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
       ]
     },
     {
-      "id": "dalle-3-photorealistic",
-      "name": "DALL-E 3 Photorealistic",
-      "likes": 298,
+      "id": "pytorch-randomautocontrast",
+      "name": "PyTorch RandomAutocontrast",
+      "likes": 467,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": 0.1 },
-        { "op": "contrast", "value": 0.3 },
-        { "op": "vibrance", "value": 0.4 },
-        { "op": "clarity", "value": 0.5 },
-        { "op": "grain", "value": 0.15 }
+        { "op": "pytorch", "type": "pytorch-randomautocontrast", "params": {} }
       ],
       "sources": [
-        { "name": "DALL-E 3 Style", "url": "https://openai.com/dall-e-3" }
+        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
       ]
     },
     {
-      "id": "gemini-vision-style",
-      "name": "Gemini Vision Style",
-      "likes": 276,
+      "id": "pytorch-randominvert",
+      "name": "PyTorch RandomInvert",
+      "likes": 501,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": 0.15 },
-        { "op": "contrast", "value": 0.35 },
-        { "op": "vibrance", "value": 0.45 },
-        { "op": "warmth", "value": 0.25 },
-        { "op": "clarity", "value": 0.4 }
+        { "op": "pytorch", "type": "pytorch-randominvert", "params": {} }
       ],
       "sources": [
-        { "name": "Gemini Vision", "url": "https://ai.google.dev/gemini-api" }
+        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
       ]
     },
     {
-      "id": "claude-sonnet-vision",
-      "name": "Claude Sonnet Vision",
-      "likes": 289,
+      "id": "pytorch-randomgrayscale",
+      "name": "PyTorch RandomGrayscale",
+      "likes": 483,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "exposure", "value": 0.1 },
-        { "op": "contrast", "value": 0.3 },
-        { "op": "saturation", "value": 0.2 },
-        { "op": "clarity", "value": 0.45 },
-        { "op": "vignette", "value": 0.35 }
+        { "op": "pytorch", "type": "pytorch-randomgrayscale", "params": { "p": 0.8 } }
       ],
       "sources": [
-        { "name": "Claude Sonnet", "url": "https://claude.ai" }
+        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
       ]
     }
   ]

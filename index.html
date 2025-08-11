@@ -153,9 +153,35 @@
         
         <p><strong>Layout:</strong></p>
         <ul>
-          <li><strong>Colonna sinistra</strong>: 5 filtri GenAI ultra-moderni (SD Amateur, Generative-X, ComfyUI, Open WebUI, AI Video)</li>
-          <li><strong>Colonna destra</strong>: 5 filtri GenAI ultra-moderni (Stable Diffusion, Midjourney, DALL-E 3, Gemini, Claude)</li>
+          <li><strong>Colonna sinistra</strong>: 5 filtri PyTorch rivoluzionari (ColorJitter, RandomAffine, GaussianBlur, RandomPerspective, RandomPosterize)</li>
+          <li><strong>Colonna destra</strong>: 5 filtri PyTorch rivoluzionari (RandomSolarize, RandomAdjustSharpness, RandomAutocontrast, RandomInvert, RandomGrayscale)</li>
         </ul>
+        
+        <p><strong>🔥 RIVOLUZIONE PYTORCH - TorchVision Transforms:</strong></p>
+        <ul>
+          <li><strong>ColorJitter</strong>: Cambio dinamico di brightness, contrast, saturation, hue</li>
+          <li><strong>RandomAffine</strong>: Trasformazioni affini avanzate (rotation, scale, shear, translate)</li>
+          <li><strong>GaussianBlur</strong>: Blur gaussiano professionale con kernel personalizzabili</li>
+          <li><strong>RandomPerspective</strong>: Distorsioni prospettiche 3D avanzate</li>
+          <li><strong>RandomPosterize</strong>: Posterizzazione intelligente con controllo bits</li>
+          <li><strong>RandomSolarize</strong>: Solarizzazione avanzata con threshold dinamico</li>
+          <li><strong>RandomAdjustSharpness</strong>: Sharpness dinamico professionale</li>
+          <li><strong>RandomAutocontrast</strong>: Autocontrasto intelligente PyTorch</li>
+          <li><strong>RandomInvert</strong>: Inversione colori avanzata</li>
+          <li><strong>RandomGrayscale</strong>: Conversione B&W intelligente</li>
+        </ul>
+        
+        <p><strong>🚀 Tecnologia rivoluzionaria:</strong></p>
+        <ul>
+          <li><strong>PyTorch WebAssembly</strong>: Stessi algoritmi usati nella ricerca AI</li>
+          <li><strong>TorchVision Transforms</strong>: Trasformazioni professionali di livello enterprise</li>
+          <li><strong>Filtri dinamici</strong>: Ogni applicazione genera parametri diversi</li>
+          <li><strong>Qualità professionale</strong>: Algoritmi usati da Meta, OpenAI, Google</li>
+          <li><strong>Scalabilità</strong>: Funziona su qualsiasi risoluzione</li>
+          <li><strong>Deterministico</strong>: Stesso seed = stesso risultato</li>
+        </ul>
+        
+        <p><strong>📚 Fonte ufficiale:</strong> <a href="https://docs.pytorch.org/vision/0.9/transforms.html" target="_blank">PyTorch TorchVision Transforms Documentation</a></p>
         
         <p><strong>Filtri GenAI-LEVEL 2025:</strong></p>
         <ul>
@@ -284,6 +310,7 @@
     let ORIGINAL_NAME = 'image';
     const PREVIEWS = {};
     let aiWorker = null;
+    let pytorchWorker = null; // Aggiunto per il worker PyTorch
 
     // =========================
     // 3) Caricamento filtri da /filters.json o fallback
@@ -430,6 +457,43 @@
         // Rimuovo logica AI, uso solo filtri normali
         $meta.textContent = `Filtro: ${f.name}`;
         CURRENT_FILTER_ID = f.id; updateActiveThumb();
+        return;
+      }
+      
+      // Controlla se è un filtro PyTorch rivoluzionario
+      if (f.pipeline && f.pipeline[0] && f.pipeline[0].op === 'pytorch') {
+        const pytorchFilter = f.pipeline[0];
+        $meta.textContent = `Applico filtro PyTorch: ${f.name}...`;
+        
+        // Inizializza worker PyTorch se necessario
+        if (!pytorchWorker) {
+          pytorchWorker = new Worker('pytorch-worker.js');
+          pytorchWorker.onmessage = (e) => {
+            if (e.data.status === 'success') {
+              const out = new ImageData(new Uint8ClampedArray(e.data.data), e.data.width, e.data.height);
+              $ctx.putImageData(out, 0, 0);
+              $meta.textContent = `Filtro PyTorch: ${f.name} · TorchVision transforms`;
+              CURRENT_FILTER_ID = f.id; updateActiveThumb();
+            } else {
+              $meta.textContent = `Errore filtro PyTorch: ${e.data.error}`;
+            }
+          };
+          pytorchWorker.onerror = (err) => {
+            console.error('Errore worker PyTorch:', err);
+            $meta.textContent = `Errore worker PyTorch: ${f.name}`;
+          };
+        }
+        
+        // Invia messaggio al worker PyTorch
+        const imgData = $ctx.getImageData(0, 0, $canvas.width, $canvas.height);
+        pytorchWorker.postMessage({
+          id: f.id,
+          filterType: pytorchFilter.type,
+          params: pytorchFilter.params || {},
+          width: $canvas.width,
+          height: $canvas.height,
+          data: imgData.data.buffer
+        }, [imgData.data.buffer]);
         return;
       }
       

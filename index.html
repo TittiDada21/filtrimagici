@@ -22,12 +22,15 @@
     button.primary{background:var(--acc);color:#052532;border:none}
     /* nuova barra filtri a pillole */
     .thumbs{display:flex;gap:8px;margin-top:8px;overflow-x:auto;padding:6px 2px}
+    .thumbs-col{display:flex;flex-direction:column;gap:8px}
     .thumb{border-radius:999px;border:1px solid #253146;padding:8px 12px;display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#cfe0f7;background:#141b28;white-space:nowrap;cursor:pointer;outline:none}
     .thumb:hover{background:#182236}
     .thumb.active{background:var(--acc); color:#052532; border-color:transparent}
     .thumb:focus-visible{box-shadow:0 0 0 2px var(--acc)}
     .thumb span{display:inline}
     .thumb img.mini{width:22px;height:22px;border-radius:4px;object-fit:cover;border:1px solid #253146;background:#0b0f16}
+    .viewer-row{display:grid;grid-template-columns:180px 1fr 180px;gap:16px;align-items:start}
+    @media (max-width: 860px){ .viewer-row{grid-template-columns:1fr} .thumbs-col{flex-direction:row;overflow:auto} }
     canvas, img#preview{width:100%;height:auto;border-radius:12px;border:1px solid #253146;background:#0b0f16}
     .muted{color:var(--muted)}
     footer{margin-top:16px;color:#8fa4be;font-size:12px}
@@ -60,28 +63,26 @@
       </div>
     </header>
 
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="drop" id="drop">
-            <strong>Carica un'immagine</strong><br/>
-            <span class="muted small">PNG/JPG, niente upload: tutto nel browser</span>
-            <div style="margin-top:12px">
-              <button id="btnUpload" class="primary">Scegli file…</button>
-            </div>
-          </div>
-          <input type="file" id="file" accept="image/*" />
-          <div class="thumbs" id="thumbs"></div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="drop" id="drop">
+        <strong>Carica un'immagine</strong><br/>
+        <span class="muted small">PNG/JPG, niente upload: tutto nel browser</span>
+        <div style="margin-top:12px">
+          <button id="btnUpload" class="primary">Scegli file…</button>
         </div>
       </div>
+      <input type="file" id="file" accept="image/*" />
+      <div class="muted small" style="margin-top:8px">Selezione automatica: ultimi 3 mesi · massima diversità · likes ≥ 10</div>
+    </div>
 
-      <div class="col">
-        <div class="card">
-          <canvas id="canvas"></canvas>
-          <img id="preview" alt="" style="display:none" />
-          <div class="muted small" style="margin-top:8px" id="meta"></div>
-        </div>
+    <div class="viewer-row">
+      <aside class="card thumbs-col" id="thumbsLeft"></aside>
+      <div class="card">
+        <canvas id="canvas"></canvas>
+        <img id="preview" alt="" style="display:none" />
+        <div class="muted small" style="margin-top:8px" id="meta"></div>
       </div>
+      <aside class="card thumbs-col" id="thumbsRight"></aside>
     </div>
 
     <!-- Pannelli testo a scomparsa -->
@@ -239,7 +240,9 @@
     const $btnRandom = document.getElementById('btnRandom');
     const $btnReset = document.getElementById('btnReset');
     const $btnDownload = document.getElementById('btnDownload');
-    const $thumbs = document.getElementById('thumbs');
+    // nuove colonne
+    const $thumbsLeft = document.getElementById('thumbsLeft');
+    const $thumbsRight = document.getElementById('thumbsRight');
     const $meta = document.getElementById('meta');
     let SOURCE_IMG = null;
     let FILTERS = [];
@@ -272,8 +275,11 @@
     // 4) Rendering miniature/nomi dei 5 filtri
     // =========================
     function renderThumbs() {
-      $thumbs.innerHTML = '';
-      FILTERS.forEach((f,idx) => {
+      $thumbsLeft.innerHTML = '';
+      $thumbsRight.innerHTML = '';
+      const half = Math.ceil(FILTERS.length/2);
+      const lists = [ {el:$thumbsLeft, arr: FILTERS.slice(0,half)}, {el:$thumbsRight, arr: FILTERS.slice(half)} ];
+      lists.forEach(list => list.arr.forEach(f => {
         const d = document.createElement('div');
         d.className = 'thumb';
         d.setAttribute('role','button');
@@ -284,8 +290,8 @@
         d.title = `likes: ${f.likes ?? 0}  ·  created: ${f.created_at}`;
         d.onclick = () => applyFilter(f);
         d.onkeydown = (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); applyFilter(f);} };
-        $thumbs.appendChild(d);
-      });
+        list.el.appendChild(d);
+      }));
       updateActiveThumb();
     }
 
@@ -303,7 +309,7 @@
           ctx.putImageData(imgData,0,0);
           const url = c.toDataURL('image/png');
           PREVIEWS[id] = url;
-          const el = $thumbs.querySelector(`.thumb[data-id="${id}"] img.mini`);
+          const el = document.querySelector(`.thumb[data-id="${id}"] img.mini`);
           if (el) el.src = url;
           const fn = listeners.get(id); if(fn) { fn(url); listeners.delete(id); }
         };

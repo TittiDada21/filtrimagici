@@ -153,12 +153,10 @@ async function main(){
       if (pickedClassic.length < 5) pickedClassic.push(cand);
     }
   }
-  const scored = [...pickedClassic, ...pickedAI];
-
-  // 3) rotazione deterministica settimanale
-  const offset = parseInt(stamp.slice(-2),10) % scored.length;
-  const rotated = scored.slice(offset).concat(scored.slice(0, offset));
-  const chosen = rotated.slice(0, 10).map(f => ({
+  // 3) rotazione deterministica settimanale, separata per categoria
+  const rot = (arr)=>{ const n = arr.length||1; const off = parseInt(stamp.slice(-2),10) % n; return arr.slice(off).concat(arr.slice(0,off)); };
+  const scored = rot(pickedClassic).slice(0,5).concat(rot(pickedAI).slice(0,5));
+  const chosen = scored.map(f => ({
     ...f,
     pipeline: f.pipeline || (
       f.family === 'contrast' ? [

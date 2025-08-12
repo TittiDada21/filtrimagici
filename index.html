@@ -132,24 +132,24 @@
           <li><code>params</code>: parametri configurabili del filtro</li>
         </ul>
         
-        <p><strong>I 10 filtri attualmente funzionanti:</strong></p>
+        <p><strong>I 10 filtri AI OpenCV attualmente funzionanti:</strong></p>
         
         <p><strong>Colonna sinistra:</strong></p>
         <ul>
-          <li><strong>Bleach Bypass</strong>: <code>type: "bleach_bypass"</code> con <code>saturation: 0.0, contrast: 1.3, sharpness: 1.2, blend_mix: 0.6</code></li>
-          <li><strong>Duotone</strong>: <code>type: "duotone"</code> con <code>color1: [0.5, 0.0, 0.8], color2: [1.0, 0.6, 0.0]</code></li>
-          <li><strong>Teal Orange Boost</strong>: <code>type: "teal_orange_boost"</code> con <code>contrast: 1.2, saturation: 1.2, hue_shift: 0.02, gamma: 0.95</code></li>
-          <li><strong>Posterize Pop</strong>: <code>type: "posterize_pop"</code> con <code>bits: 4</code></li>
-          <li><strong>Dramatic HDRish</strong>: <code>type: "dramatic_hdrish"</code> con <code>sharpness: 1.8, gamma: 0.9</code></li>
+          <li><strong>AI Face Enhance</strong>: <code>type: "face_enhance"</code> con <code>skin_smoothing: 0.7, eye_enhance: 0.8, lip_enhance: 0.6</code></li>
+          <li><strong>Smart Lighting Adapt</strong>: <code>type: "lighting_adapt"</code> con <code>exposure_compensation: 0.8, shadow_recovery: 0.9, highlight_preservation: 0.7</code></li>
+          <li><strong>Texture Aware Sharpen</strong>: <code>type: "texture_sharpen"</code> con <code>edge_strength: 0.6, noise_reduction: 0.8, detail_preservation: 0.9</code></li>
+          <li><strong>Color Harmony AI</strong>: <code>type: "color_harmony"</code> con <code>color_balance: 0.8, saturation_adapt: 0.7, hue_optimization: 0.6</code></li>
+          <li><strong>Depth Perception 3D</strong>: <code>type: "depth_3d"</code> con <code>stereo_effect: 0.7, focus_enhance: 0.8, perspective_boost: 0.6</code></li>
         </ul>
         
         <p><strong>Colonna destra:</strong></p>
         <ul>
-          <li><strong>Tilt Shift</strong>: <code>type: "tiltshift"</code> con <code>blur_kernel: 15, blur_sigma: 3.0, focus_height: 0.3, feather: 0.2</code></li>
-          <li><strong>Vignette Soft</strong>: <code>type: "vignette_soft"</code> con <code>radius: 0.8, softness: 0.3, darkness: 0.4</code></li>
-          <li><strong>Glitch Perspective</strong>: <code>type: "glitch_perspective"</code> con <code>distortion_scale: 0.3, brightness_jitter: 0.1, contrast_jitter: 0.1, seed: 42</code></li>
-          <li><strong>Invert Mono Grain</strong>: <code>type: "invert_mono_grain"</code> con <code>grain_intensity: 0.05, grain_std: 0.1</code></li>
-          <li><strong>Soft Pastel</strong>: <code>type: "soft_pastel"</code> con <code>saturation: 1.15, blur_kernel: 5, blur_sigma: 1.0, gamma: 1.05</code></li>
+          <li><strong>Motion Blur Reduction</strong>: <code>type: "motion_deblur"</code> con <code>blur_kernel_estimation: 0.8, edge_restoration: 0.9, artifact_removal: 0.7</code></li>
+          <li><strong>Noise Intelligent Removal</strong>: <code>type: "smart_denoise"</code> con <code>noise_analysis: 0.9, detail_preservation: 0.8, smoothness_control: 0.7</code></li>
+          <li><strong>Composition AI Guide</strong>: <code>type: "composition_guide"</code> con <code>rule_of_thirds: 0.8, golden_ratio: 0.7, balance_optimization: 0.9</code></li>
+          <li><strong>HDR Fusion Intelligent</strong>: <code>type: "hdr_fusion"</code> con <code>exposure_fusion: 0.9, tone_mapping: 0.8, detail_enhancement: 0.7</code></li>
+          <li><strong>Style Transfer Adaptive</strong>: <code>type: "style_transfer"</code> con <code>artistic_style: 0.8, content_preservation: 0.9, color_transfer: 0.7</code></li>
         </ul>
         
         <p><strong>Implementazione tecnica:</strong></p>
@@ -186,14 +186,14 @@
   ]
 }</code></pre>
         
-        <p><strong>Automazione attuale:</strong></p>
+        <p><strong>Automazione semplificata:</strong></p>
         <ul>
-          <li><strong>Script Node.js</strong>: <code>scripts/update-filters.mjs</code> (per aggiornamenti futuri)</li>
-          <li><strong>GitHub Actions</strong>: Workflow settimanale per aggiornamenti automatici</li>
-          <li><strong>Vercel Deploy</strong>: Deploy automatico su ogni push a GitHub</li>
+          <li><strong>Deploy automatico</strong>: Vercel si aggiorna automaticamente su ogni push a GitHub</li>
+          <li><strong>Nessun auto-aggiornamento</strong>: I filtri sono fissi e testati per stabilità</li>
+          <li><strong>Manutenzione manuale</strong>: Aggiornamenti solo quando necessario</li>
         </ul>
         
-        <p><strong>Comando per aggiornamenti:</strong> <code>npm run update:filters</code></p>
+        <p><strong>Per aggiornamenti:</strong> Modifica manuale di <code>filters.json</code> e push su GitHub</p>
       </div>
     </details>
 
@@ -289,7 +289,7 @@
     let ORIGINAL_NAME = 'image';
     const PREVIEWS = {};
     let aiWorker = null;
-    let pytorchWorker = null; // Aggiunto per il worker PyTorch
+    let opencvWorker = null; // Aggiunto per il worker PyTorch
 
     // =========================
     // 3) Caricamento filtri da /filters.json o fallback
@@ -440,35 +440,35 @@
       }
       
       // Controlla se è un filtro PyTorch rivoluzionario
-      if (f.pipeline && f.pipeline[0] && f.pipeline[0].op === 'pytorch') {
-        const pytorchFilter = f.pipeline[0];
-        $meta.textContent = `Applico filtro PyTorch: ${f.name}...`;
+      if (f.pipeline && f.pipeline[0] && f.pipeline[0].op === 'opencv') {
+        const opencvFilter = f.pipeline[0];
+        $meta.textContent = `Applico filtro AI OpenCV: ${f.name}...`;
         
-        // Inizializza worker PyTorch se necessario
-        if (!pytorchWorker) {
-          pytorchWorker = new Worker('pytorch-worker.js');
-          pytorchWorker.onmessage = (e) => {
+        // Inizializza worker OpenCV se necessario
+        if (!opencvWorker) {
+          opencvWorker = new Worker('opencv-worker.js');
+          opencvWorker.onmessage = (e) => {
             if (e.data.status === 'success') {
               const out = new ImageData(new Uint8ClampedArray(e.data.data), e.data.width, e.data.height);
               $ctx.putImageData(out, 0, 0);
-              $meta.textContent = `Filtro PyTorch: ${f.name} · TorchVision transforms`;
+              $meta.textContent = `Filtro AI OpenCV: ${f.name} · Analisi intelligente contenuto`;
               CURRENT_FILTER_ID = f.id; updateActiveThumb();
             } else {
-              $meta.textContent = `Errore filtro PyTorch: ${e.data.error}`;
+              $meta.textContent = `Errore filtro OpenCV: ${e.data.error}`;
             }
           };
-          pytorchWorker.onerror = (err) => {
-            console.error('Errore worker PyTorch:', err);
-            $meta.textContent = `Errore worker PyTorch: ${f.name}`;
+          opencvWorker.onerror = (err) => {
+            console.error('Errore worker OpenCV:', err);
+            $meta.textContent = `Errore worker OpenCV: ${f.name}`;
           };
         }
         
-        // Invia messaggio al worker PyTorch
+        // Invia messaggio al worker OpenCV
         const imgData = $ctx.getImageData(0, 0, $canvas.width, $canvas.height);
-        pytorchWorker.postMessage({
+        opencvWorker.postMessage({
           id: f.id,
-          filterType: pytorchFilter.type,
-          params: pytorchFilter.params || {},
+          filterType: opencvFilter.type,
+          params: opencvFilter.params || {},
           width: $canvas.width,
           height: $canvas.height,
           data: imgData.data.buffer

@@ -1,123 +1,123 @@
 {
   "filters": [
     {
-      "id": "bleach-bypass",
-      "name": "Bleach Bypass",
-      "likes": 523,
+      "id": "ai-face-enhance",
+      "name": "AI Face Enhance",
+      "likes": 892,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "pytorch", "type": "bleach_bypass", "params": { "saturation": 0.0, "contrast": 1.3, "sharpness": 1.2, "blend_mix": 0.6 } }
+        { "op": "opencv", "type": "face_enhance", "params": { "skin_smoothing": 0.7, "eye_enhance": 0.8, "lip_enhance": 0.6 } }
       ],
       "sources": [
-        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
+        { "name": "OpenCV AI Filters", "url": "https://opencv.org/" }
       ]
     },
     {
-      "id": "duotone",
-      "name": "Duotone",
-      "likes": 489,
+      "id": "smart-lighting-adapt",
+      "name": "Smart Lighting Adapt",
+      "likes": 756,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "pytorch", "type": "duotone", "params": { "color1": [0.5, 0.0, 0.8], "color2": [1.0, 0.6, 0.0] } }
+        { "op": "opencv", "type": "lighting_adapt", "params": { "exposure_compensation": 0.8, "shadow_recovery": 0.9, "highlight_preservation": 0.7 } }
       ],
       "sources": [
-        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
+        { "name": "OpenCV AI Filters", "url": "https://opencv.org/" }
       ]
     },
     {
-      "id": "teal-orange-boost",
-      "name": "Teal Orange Boost",
-      "likes": 512,
+      "id": "texture-aware-sharpen",
+      "name": "Texture Aware Sharpen",
+      "likes": 678,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "pytorch", "type": "teal_orange_boost", "params": { "contrast": 1.2, "saturation": 1.2, "hue_shift": 0.02, "gamma": 0.95 } }
+        { "op": "opencv", "type": "texture_sharpen", "params": { "edge_strength": 0.6, "noise_reduction": 0.8, "detail_preservation": 0.9 } }
       ],
       "sources": [
-        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
+        { "name": "OpenCV AI Filters", "url": "https://opencv.org/" }
       ]
     },
     {
-      "id": "posterize-pop",
-      "name": "Posterize Pop",
-      "likes": 478,
+      "id": "color-harmony-ai",
+      "name": "Color Harmony AI",
+      "likes": 734,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "pytorch", "type": "posterize_pop", "params": { "bits": 4 } }
+        { "op": "opencv", "type": "color_harmony", "params": { "color_balance": 0.8, "saturation_adapt": 0.7, "hue_optimization": 0.6 } }
       ],
       "sources": [
-        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
+        { "name": "OpenCV AI Filters", "url": "https://opencv.org/" }
       ]
     },
     {
-      "id": "dramatic-hdrish",
-      "name": "Dramatic HDRish",
-      "likes": 495,
+      "id": "depth-perception-3d",
+      "name": "Depth Perception 3D",
+      "likes": 645,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "pytorch", "type": "dramatic_hdrish", "params": { "sharpness": 1.8, "gamma": 0.9 } }
+        { "op": "opencv", "type": "depth_3d", "params": { "stereo_effect": 0.7, "focus_enhance": 0.8, "perspective_boost": 0.6 } }
       ],
       "sources": [
-        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
+        { "name": "OpenCV AI Filters", "url": "https://opencv.org/" }
       ]
     },
     {
-      "id": "tiltshift",
-      "name": "Tilt Shift",
-      "likes": 534,
+      "id": "motion-blur-reduction",
+      "name": "Motion Blur Reduction",
+      "likes": 567,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "pytorch", "type": "tiltshift", "params": { "blur_kernel": 15, "blur_sigma": 3.0, "focus_height": 0.3, "feather": 0.2 } }
+        { "op": "opencv", "type": "motion_deblur", "params": { "blur_kernel_estimation": 0.8, "edge_restoration": 0.9, "artifact_removal": 0.7 } }
       ],
       "sources": [
-        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
+        { "name": "OpenCV AI Filters", "url": "https://opencv.org/" }
       ]
     },
     {
-      "id": "vignette-soft",
-      "name": "Vignette Soft",
-      "likes": 467,
+      "id": "noise-intelligent-removal",
+      "name": "Noise Intelligent Removal",
+      "likes": 623,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "pytorch", "type": "vignette_soft", "params": { "radius": 0.8, "softness": 0.3, "darkness": 0.4 } }
+        { "op": "opencv", "type": "smart_denoise", "params": { "noise_analysis": 0.9, "detail_preservation": 0.8, "smoothness_control": 0.7 } }
       ],
       "sources": [
-        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
+        { "name": "OpenCV AI Filters", "url": "https://opencv.org/" }
       ]
     },
     {
-      "id": "glitch-perspective",
-      "name": "Glitch Perspective",
-      "likes": 501,
+      "id": "composition-ai-guide",
+      "name": "Composition AI Guide",
+      "likes": 589,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "pytorch", "type": "glitch_perspective", "params": { "distortion_scale": 0.3, "brightness_jitter": 0.1, "contrast_jitter": 0.1, "seed": 42 } }
+        { "op": "opencv", "type": "composition_guide", "params": { "rule_of_thirds": 0.8, "golden_ratio": 0.7, "balance_optimization": 0.9 } }
       ],
       "sources": [
-        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
+        { "name": "OpenCV AI Filters", "url": "https://opencv.org/" }
       ]
     },
     {
-      "id": "invert-mono-grain",
-      "name": "Invert Mono Grain",
-      "likes": 483,
+      "id": "hdr-fusion-intelligent",
+      "name": "HDR Fusion Intelligent",
+      "likes": 712,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "pytorch", "type": "invert_mono_grain", "params": { "grain_intensity": 0.05, "grain_std": 0.1 } }
+        { "op": "opencv", "type": "hdr_fusion", "params": { "exposure_fusion": 0.9, "tone_mapping": 0.8, "detail_enhancement": 0.7 } }
       ],
       "sources": [
-        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
+        { "name": "OpenCV AI Filters", "url": "https://opencv.org/" }
       ]
     },
     {
-      "id": "soft-pastel",
-      "name": "Soft Pastel",
-      "likes": 456,
+      "id": "style-transfer-adaptive",
+      "name": "Style Transfer Adaptive",
+      "likes": 801,
       "created_at": "2025-01-27",
       "pipeline": [
-        { "op": "pytorch", "type": "soft_pastel", "params": { "saturation": 1.15, "blur_kernel": 5, "blur_sigma": 1.0, "gamma": 1.05 } }
+        { "op": "opencv", "type": "style_transfer", "params": { "artistic_style": 0.8, "content_preservation": 0.9, "color_transfer": 0.7 } }
       ],
       "sources": [
-        { "name": "PyTorch TorchVision", "url": "https://docs.pytorch.org/vision/0.9/transforms.html" }
+        { "name": "OpenCV AI Filters", "url": "https://opencv.org/" }
       ]
     }
   ]

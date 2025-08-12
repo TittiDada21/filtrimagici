@@ -115,106 +115,85 @@
     <details class="panel">
       <summary>Schema e automazione di filters.json</summary>
       <div class="panel-body prose">
-        <p><strong>Struttura:</strong></p>
+        <p><strong>Struttura attuale:</strong></p>
         <ul>
-          <li><code>id</code>: identificativo univoco</li>
-          <li><code>name</code>: nome visualizzato</li>
-          <li><code>likes</code>: popolarità (≥10 per selezione)</li>
-          <li><code>created_at</code>: data creazione (ultimi 3 mesi)</li>
-          <li><code>pipeline</code>: sequenza operazioni</li>
-          <li><code>sources</code>: fonti e crediti</li>
+          <li><code>id</code>: identificativo univoco del filtro</li>
+          <li><code>name</code>: nome visualizzato nell'interfaccia</li>
+          <li><code>likes</code>: popolarità (valori da 456 a 534)</li>
+          <li><code>created_at</code>: data creazione (2025-01-27)</li>
+          <li><code>pipeline</code>: operazione PyTorch con parametri</li>
+          <li><code>sources</code>: fonte PyTorch TorchVision</li>
         </ul>
         
-        <p><strong>Operazioni disponibili:</strong></p>
+        <p><strong>Operazioni implementate:</strong></p>
         <ul>
-          <li><code>exposure</code>: luminosità generale</li>
-          <li><code>contrast</code>: contrasto</li>
-          <li><code>vibrance</code>: saturazione intelligente</li>
-          <li><code>saturation</code>: saturazione globale</li>
-          <li><code>hue</code>: tonalità (0-1)</li>
-          <li><code>warmth</code>: temperatura colore</li>
-          <li><code>levels</code>: {low, high} per mappatura toni</li>
-          <li><code>grayscale</code>: conversione B&W</li>
-          <li><code>edge</code>: {amount} per rilevamento bordi</li>
-          <li><code>splitTone</code>: {shadows: {h, s}, highlights: {h, s}}</li>
-          <li><code>clarity</code>: sharpening/unsharp mask</li>
-          <li><code>vignette</code>: oscuramento bordi</li>
-          <li><code>grain</code>: texture filmica</li>
-          <li><code>halftone</code>: {size} per pattern stampa</li>
+          <li><code>op: "pytorch"</code>: tipo di operazione</li>
+          <li><code>type</code>: nome specifico del filtro (es. "bleach_bypass")</li>
+          <li><code>params</code>: parametri configurabili del filtro</li>
         </ul>
         
-        <p><strong>Regole selezione automatica:</strong></p>
+        <p><strong>I 10 filtri attualmente funzionanti:</strong></p>
+        
+        <p><strong>Colonna sinistra:</strong></p>
         <ul>
-          <li><strong>Recency</strong>: solo filtri ultimi 3 mesi</li>
-          <li><strong>Popularity</strong>: likes ≥ 10</li>
-          <li><strong>Diversity</strong>: pipeline diverse per massima varietà</li>
-          <li><strong>Source</strong>: tutti da Filterous2 (libreria consolidata)</li>
+          <li><strong>Bleach Bypass</strong>: <code>type: "bleach_bypass"</code> con <code>saturation: 0.0, contrast: 1.3, sharpness: 1.2, blend_mix: 0.6</code></li>
+          <li><strong>Duotone</strong>: <code>type: "duotone"</code> con <code>color1: [0.5, 0.0, 0.8], color2: [1.0, 0.6, 0.0]</code></li>
+          <li><strong>Teal Orange Boost</strong>: <code>type: "teal_orange_boost"</code> con <code>contrast: 1.2, saturation: 1.2, hue_shift: 0.02, gamma: 0.95</code></li>
+          <li><strong>Posterize Pop</strong>: <code>type: "posterize_pop"</code> con <code>bits: 4</code></li>
+          <li><strong>Dramatic HDRish</strong>: <code>type: "dramatic_hdrish"</code> con <code>sharpness: 1.8, gamma: 0.9</code></li>
         </ul>
         
-                   <p><strong>Layout:</strong></p>
-           <ul>
-             <li><strong>Colonna sinistra</strong>: 5 filtri creativi PyTorch (Bleach Bypass, Duotone, Teal Orange Boost, Posterize Pop, Dramatic HDRish)</li>
-             <li><strong>Colonna destra</strong>: 5 filtri creativi PyTorch (Tilt Shift, Vignette Soft, Glitch Perspective, Invert Mono Grain, Soft Pastel)</li>
-           </ul>
-           
-           <p><strong>🎨 FILTRI CREATIVI PYTORCH - Implementazione Reale:</strong></p>
-           <ul>
-             <li><strong>Bleach Bypass</strong>: Effetto cinema professionale con desaturazione e contrast elevato</li>
-             <li><strong>Duotone</strong>: Mappa viola→arancione con interpolazione RGB intelligente</li>
-             <li><strong>Teal Orange Boost</strong>: Look blockbuster con contrast, saturation, hue shift e gamma</li>
-             <li><strong>Posterize Pop</strong>: Stile pop artistico con posterizzazione a 4 bits</li>
-             <li><strong>Dramatic HDRish</strong>: Pseudo HDR single-shot con autocontrast e sharpness</li>
-             <li><strong>Tilt Shift</strong>: Miniatura con maschera verticale nitido→sfocato</li>
-             <li><strong>Vignette Soft</strong>: Vignettatura dolce con maschera radiale personalizzabile</li>
-             <li><strong>Glitch Perspective</strong>: Distorsione prospettica con ColorJitter per look "analog"</li>
-             <li><strong>Invert Mono Grain</strong>: Inversione colori + conversione mono + grana filmica</li>
-             <li><strong>Soft Pastel</strong>: Look pastello elegante con equalizzazione, saturation, blur e gamma</li>
-           </ul>
-        
-                   <p><strong>🚀 Tecnologia rivoluzionaria:</strong></p>
-           <ul>
-             <li><strong>Algoritmi Avanzati</strong>: Implementazione nativa JavaScript di qualità professionale</li>
-             <li><strong>Filtri Creativi</strong>: 10 effetti unici e diversi tra loro</li>
-             <li><strong>Performance Ottimizzate</strong>: Lavora direttamente sui pixel per massima velocità</li>
-             <li><strong>Parametri Configurabili</strong>: Ogni filtro ha parametri personalizzabili</li>
-             <li><strong>Qualità HD</strong>: Mantiene la massima qualità dell'immagine originale</li>
-             <li><strong>Web Worker</strong>: Elaborazione asincrona senza bloccare l'interfaccia</li>
-           </ul>
-        
-        <p><strong>📚 Fonte ufficiale:</strong> <a href="https://docs.pytorch.org/vision/0.9/transforms.html" target="_blank">PyTorch TorchVision Transforms Documentation</a></p>
-        
-        <p><strong>Filtri GenAI-LEVEL 2025:</strong></p>
+        <p><strong>Colonna destra:</strong></p>
         <ul>
-          <li><strong>SD Amateur Realism</strong>: Realismo fotografico con grana e sharpening</li>
-          <li><strong>Generative-X Augment</strong>: Augmentazione AI con split-tone avanzato</li>
-          <li><strong>ComfyUI NSFW Filter</strong>: Filtro di sicurezza per contenuti AI</li>
-          <li><strong>Open WebUI Tools</strong>: Toolkit AI workstation avanzato</li>
-          <li><strong>AI Video Realtime</strong>: Elaborazione video AI in tempo reale</li>
-          <li><strong>Stable Diffusion NSFW</strong>: Filtro SD per contenuti sicuri</li>
-          <li><strong>Midjourney Cinematic</strong>: Stile cinematografico MJ</li>
-          <li><strong>DALL-E 3 Photorealistic</strong>: Fotorealismo OpenAI</li>
-          <li><strong>Gemini Vision Style</strong>: Stile Google AI</li>
-          <li><strong>Claude Sonnet Vision</strong>: Stile Anthropic AI</li>
+          <li><strong>Tilt Shift</strong>: <code>type: "tiltshift"</code> con <code>blur_kernel: 15, blur_sigma: 3.0, focus_height: 0.3, feather: 0.2</code></li>
+          <li><strong>Vignette Soft</strong>: <code>type: "vignette_soft"</code> con <code>radius: 0.8, softness: 0.3, darkness: 0.4</code></li>
+          <li><strong>Glitch Perspective</strong>: <code>type: "glitch_perspective"</code> con <code>distortion_scale: 0.3, brightness_jitter: 0.1, contrast_jitter: 0.1, seed: 42</code></li>
+          <li><strong>Invert Mono Grain</strong>: <code>type: "invert_mono_grain"</code> con <code>grain_intensity: 0.05, grain_std: 0.1</code></li>
+          <li><strong>Soft Pastel</strong>: <code>type: "soft_pastel"</code> con <code>saturation: 1.15, blur_kernel: 5, blur_sigma: 1.0, gamma: 1.05</code></li>
         </ul>
         
-        <p><strong>Fonti ultra-moderne:</strong></p>
+        <p><strong>Implementazione tecnica:</strong></p>
         <ul>
-          <li><strong>GitHub 2024-2025</strong>: Repository più discussi nei forum</li>
-          <li><strong>Stable Diffusion</strong>: Community più attiva</li>
-          <li><strong>Midjourney</strong>: Stili cinematografici</li>
-          <li><strong>OpenAI DALL-E 3</strong>: Fotorealismo avanzato</li>
-          <li><strong>Google Gemini</strong>: Vision AI di Google</li>
-          <li><strong>Anthropic Claude</strong>: AI etica avanzata</li>
+          <li><strong>Web Worker</strong>: <code>pytorch-worker.js</code> elabora i filtri in background</li>
+          <li><strong>Algoritmi nativi</strong>: Implementazione JavaScript pura senza dipendenze esterne</li>
+          <li><strong>Elaborazione pixel</strong>: Lavora direttamente sui dati immagine per massima qualità</li>
+          <li><strong>Parametri dinamici</strong>: Ogni filtro ha valori configurabili per personalizzazione</li>
         </ul>
         
-        <p><strong>Automazione:</strong></p>
+        <p><strong>Esempio struttura filtro:</strong></p>
+        <pre><code>{
+  "id": "bleach-bypass",
+  "name": "Bleach Bypass",
+  "likes": 523,
+  "created_at": "2025-01-27",
+  "pipeline": [
+    {
+      "op": "pytorch",
+      "type": "bleach_bypass",
+      "params": {
+        "saturation": 0.0,
+        "contrast": 1.3,
+        "sharpness": 1.2,
+        "blend_mix": 0.6
+      }
+    }
+  ],
+  "sources": [
+    {
+      "name": "PyTorch TorchVision",
+      "url": "https://docs.pytorch.org/vision/0.9/transforms.html"
+    }
+  ]
+}</code></pre>
+        
+        <p><strong>Automazione attuale:</strong></p>
         <ul>
-          <li><strong>Script Node.js</strong>: <code>scripts/update-filters.mjs</code></li>
-          <li><strong>GitHub Actions</strong>: aggiornamento settimanale automatico</li>
-          <li><strong>Vercel Cron</strong>: alternativa serverless (opzionale)</li>
+          <li><strong>Script Node.js</strong>: <code>scripts/update-filters.mjs</code> (per aggiornamenti futuri)</li>
+          <li><strong>GitHub Actions</strong>: Workflow settimanale per aggiornamenti automatici</li>
+          <li><strong>Vercel Deploy</strong>: Deploy automatico su ogni push a GitHub</li>
         </ul>
         
-        <p><strong>Comando manuale:</strong> <code>npm run update:filters</code></p>
+        <p><strong>Comando per aggiornamenti:</strong> <code>npm run update:filters</code></p>
       </div>
     </details>
 
